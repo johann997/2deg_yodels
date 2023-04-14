@@ -11,11 +11,11 @@ To run this script, you'll need to set up a virtual environment and install the 
 
 
 3. Run the setup script:
-`./setup.sh`
+`bash -l setup.sh`
 
 
 4. Activate the virtual environment:
-`conda activate 2deg_yodels`
+`conda activate 2deg_yodels_env`
 
 
 5. Run the script:
