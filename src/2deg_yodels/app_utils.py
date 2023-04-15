@@ -2,7 +2,11 @@
 # import dash_html_components as html
 # from dash.dependencies import Input, Output, State
 import numpy as np
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash
+from dash import dcc
+from dash import html
+from dash.dependencies import Input, Output, State
+
 
 
 def create_n_sliders(num_sliders, app_layout):
