@@ -1,3 +1,4 @@
+print("Running app.py")
 import os
 import numpy as np
 from dash import Dash
@@ -21,9 +22,13 @@ from utils import (
     plot_polyline,
 )
 
-UPLOAD_DIRECTORY = f"{os.getcwd()}/uploaded_files"
+UPLOAD_DIRECTORY = f"{os.getcwd()}/temp_uploaded_files"
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
+
+PROCESSED_DIRECTORY = f"{os.getcwd()}/temp_processed_data"
+if not os.path.exists(PROCESSED_DIRECTORY):
+    os.makedirs(PROCESSED_DIRECTORY)
 
 app_layout, app_inputs = create_app_layout(default_fig(), UPLOAD_DIRECTORY)
 
@@ -109,7 +114,8 @@ def update_potential_csv(
             discretised_gates, material_info
         )
         save_geometric_potential_to_csv(
-            discretised_gates_new, csv_name="geometric_potential.csv"
+            discretised_gates_new,
+            csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv",
         )
         return None
 
@@ -134,7 +140,7 @@ def update_potential(
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
-            nx, ny, csv_name="geometric_potential.csv"
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
         )
         z_data = 0
         index = -1

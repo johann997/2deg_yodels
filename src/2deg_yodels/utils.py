@@ -16,8 +16,18 @@ import plotly.io as pio
 
 default_layout = dict(
     template="plotly_white",
-    xaxis=dict(mirror=True, ticks="outside", showline=True, linecolor="black",),
-    yaxis=dict(mirror=True, ticks="outside", showline=True, linecolor="black",),
+    xaxis=dict(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+    ),
+    yaxis=dict(
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+    ),
 )
 
 
@@ -53,7 +63,6 @@ def plot_discretised_gates(
     colorscale="Greens",
     color_range=None,
 ):
-
     x_axis = discretised_gates["x_axis"]
     y_axis = discretised_gates["y_axis"]
 
@@ -63,7 +72,6 @@ def plot_discretised_gates(
 
     for key, val in discretised_gates.items():
         if "val_" in key:
-
             z_data += val[plot_type] * val["gate_val"]
 
     if color_range is None:
@@ -95,7 +103,8 @@ def plot_discretised_gates(
 
     update_plotly_layout(fig)
     fig.update_yaxes(
-        scaleanchor="x", scaleratio=1,
+        scaleanchor="x",
+        scaleratio=1,
     )
 
     if plot:
@@ -118,7 +127,7 @@ def get_potential_from_gate(discretised_gates, material_info):
     d = material_info["2deg_depth"]
 
     def get_g(u, v):
-        R = np.sqrt(u ** 2 + v ** 2 + d ** 2)
+        R = np.sqrt(u**2 + v**2 + d**2)
         return np.arctan((u * v) / (d * R)) / (2 * np.pi)
 
     for key, val in discretised_gates.items():
@@ -129,7 +138,6 @@ def get_potential_from_gate(discretised_gates, material_info):
 
             for x_index, x in enumerate(x_axis):
                 for y_index, y in enumerate(y_axis):
-
                     if gate_coords[y_index, x_index] != 0:
                         L = x - del_x_half
                         R = x + del_x_half
@@ -148,7 +156,7 @@ def get_potential_from_gate(discretised_gates, material_info):
 
 
 def save_geometric_potential_to_csv(
-    discretised_gates, csv_name="geometric_potential.csv"
+    discretised_gates, csv_name="temp_processed_data/geometric_potential.csv"
 ):
     csv_df = pd.DataFrame([])
 
@@ -178,8 +186,9 @@ def get_1d_to_2d(array, nx, ny):
     return np.array(array).reshape(ny, nx)
 
 
-def get_discretised_gates_from_csv(nx, ny, csv_name="geometric_potential.csv"):
-
+def get_discretised_gates_from_csv(
+    nx, ny, csv_name="temp_processed_data/geometric_potential.csv"
+):
     df = pd.read_csv(csv_name)
     column_names = df.columns
 
@@ -220,7 +229,6 @@ def get_discretised_gates(plot_info, polyline_gates):
 
     gate_num = 0
     for key, val in polyline_gates.items():
-
         x_data = val["x_array"]
         y_data = val["y_array"]
 
@@ -247,7 +255,6 @@ def get_discretised_gates(plot_info, polyline_gates):
 
 
 def get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny):
-
     max_range = np.max([maxy - miny, maxx - minx])
     mean_x = (minx + maxx) / 2
     mean_y = (miny + maxy) / 2
@@ -340,12 +347,15 @@ def plot_polyline(name, upload_directory, dxf_file=""):
         )
 
     fig.update_layout(
-        title=f"Plotting {dxf_file}", yaxis_zeroline=True, xaxis_zeroline=True,
+        title=f"Plotting {dxf_file}",
+        yaxis_zeroline=True,
+        xaxis_zeroline=True,
     )
 
     update_plotly_layout(fig)
     fig.update_yaxes(
-        scaleanchor="x", scaleratio=1,
+        scaleanchor="x",
+        scaleratio=1,
     )
 
     return fig
@@ -359,4 +369,3 @@ def uploaded_files(upload_directory):
         if os.path.isfile(path):
             files.append(filename)
     return files
-

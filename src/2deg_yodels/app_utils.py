@@ -8,7 +8,6 @@ from dash import html
 from dash.dependencies import Input, Output, State
 
 
-
 def create_n_sliders(num_sliders, app_layout):
     slider_layouts = []
     app_inputs = []
@@ -127,7 +126,10 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
 
     potential_layout = [
         html.Div(
-            [html.H4("Potential chane in 2DEG"), dcc.Graph(id="potential-graph"),],
+            [
+                html.H4("Potential chane in 2DEG"),
+                dcc.Graph(id="potential-graph"),
+            ],
             style={"width": "59%", "height": "59%", "display": "inline-block"},
         )
     ]
