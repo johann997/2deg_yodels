@@ -62,6 +62,7 @@ def plot_discretised_gates(
     plot=True,
     colorscale="Greens",
     color_range=None,
+    plot_3d=False,
 ):
     x_axis = discretised_gates["x_axis"]
     y_axis = discretised_gates["y_axis"]
@@ -69,27 +70,71 @@ def plot_discretised_gates(
     fig = default_fig()
 
     z_data = np.zeros((np.shape(y_axis)[0], np.shape(x_axis)[0]))
+    gate_data = np.zeros((np.shape(y_axis)[0], np.shape(x_axis)[0]))
 
     for key, val in discretised_gates.items():
         if "val_" in key:
             z_data += val[plot_type] * val["gate_val"]
+            gate_data += val["coordinates"]
 
     if color_range is None:
         zmin, zmax = np.min(z_data), np.max(z_data)
     else:
         zmin, zmax = color_range[0], color_range[1]
 
-    fig.add_trace(
-        go.Heatmap(
-            z=z_data,
+    if not plot_3d:
+        fig.add_trace(
+            go.Heatmap(
+                z=z_data,
+                x=x_axis,
+                y=y_axis,
+                colorscale=colorscale,
+                zmin=zmin,
+                zmax=zmax,
+                opacity=1,
+            )
+        )
+    elif plot_3d:
+        # 3d surface
+        surface_trace = go.Surface(
             x=x_axis,
             y=y_axis,
+            z=z_data,
             colorscale=colorscale,
-            zmin=zmin,
-            zmax=zmax,
-            opacity=1,
         )
-    )
+        fig.add_trace(surface_trace)
+
+        # heatmap to see gate outline
+        gate_index = np.where(gate_data == 1)
+        nogate_index = np.where(gate_data != 1)
+        gate_data[gate_index] = (
+            gate_data[gate_index] / np.max(gate_data) * np.max(z_data)
+        ) + np.max(z_data) * 0.1
+        gate_data[nogate_index] = np.max(z_data) * 0.0999
+
+        fig.add_trace(
+            go.Surface(
+                z=gate_data,
+                x=x_axis,
+                y=y_axis,
+                colorscale="greys",
+                showscale=False,
+                reversescale=True,
+                opacity=0.5,
+                cmin=np.max(z_data) * 0.0999,
+                cmax=np.max(z_data) * 0.1,
+            )
+        )
+
+        # heatmap_trace.colorbar.update(dict(outlinewidth=0, thickness=15, len=1))
+        # heatmap_trace.colorbar.update_z(zmin=np.min(z_data))
+        # heatmap_trace.update_z(z=np.min(z_data))
+
+        # fig.update_layout(
+        #     autosize=False,
+        #     scene_camera_eye=dict(x=1.87, y=0.88, z=-0.64),
+        #     margin=dict(l=65, r=50, b=65, t=90),
+        # )
 
     fig.update_layout(
         #         title=f'Plotting {dxf_file}',
