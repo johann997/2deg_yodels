@@ -1,5 +1,6 @@
 import os
 import base64
+import copy
 import ezdxf  # pip install ezdxf https://pypi.org/project/ezdxf/
 
 from matplotlib.path import Path
@@ -255,7 +256,7 @@ def get_discretised_gates_from_csv(
         else:
             discretised_gates[column_name] = df[column_name].dropna().to_numpy()
 
-    return discretised_gates
+    return copy.deepcopy(discretised_gates)
 
 
 def get_discretised_gates(plot_info, polyline_gates):
