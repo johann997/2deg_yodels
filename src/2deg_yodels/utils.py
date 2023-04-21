@@ -414,3 +414,13 @@ def uploaded_files(upload_directory):
         if os.path.isfile(path):
             files.append(filename)
     return files
+
+
+
+############################
+##### MATH #####
+############################
+
+def reduce_multiple(array):
+    "Divide array by greatest common divider"
+    return (array / np.gcd.reduce(array)).astype(int)
