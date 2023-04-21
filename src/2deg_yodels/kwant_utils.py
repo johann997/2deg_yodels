@@ -1,3 +1,4 @@
+import copy
 import kwant as kw
 from scipy.interpolate import interp2d
 import numpy as np
@@ -230,8 +231,10 @@ def make_system(
 
 
 def get_interpolated_potential(discretised_gates):
+
+    discretised_gates_copy = copy.deepcopy(discretised_gates)
     x, y, potential = get_xyz_from_discretised_gates(
-        discretised_gates, data_type="potential"
+        discretised_gates_copy, data_type="potential"
     )
     x *= um_to_nm  # put in units of nm
     y *= um_to_nm
@@ -241,19 +244,11 @@ def get_interpolated_potential(discretised_gates):
 
 
 def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts):
-    # x, y, potential = get_xyz_from_discretised_gates(
-    #     discretised_gates, data_type="potential"
-    # )
-    # x *= um_to_nm  # put in units of nm
-    # y *= um_to_nm
+
     interpolated_potential = get_interpolated_potential(discretised_gates)
 
-    # a = 1  # lattice constant of the tight-binding system (nm)
+    # lattice constant of the tight-binding system (nm)
     a = int(get_lattice_constant(minx, maxx, miny, maxy, numpts=numpts) * um_to_nm)
-
-    # Interpolating the extracted electric potential to fit the lattice passed to Kwant
-    # It is used by some of the functions defined before - the first set
-    # interpolated_potential = interp2d(x, y, potential)
 
     ##### Creating a square lattice #####
     lat = kw.lattice.square(a)
@@ -300,13 +295,6 @@ def plot_kwant_potential(discretised_gates, qpc):
     )
 
 
-# ##### Electric potential #####
-# kw.plotter.map(
-#     qpc,
-#     lambda s: qpc_potential(
-#         s,
-#     ),
-# )
 
 
 # ##### Finalise system #####
