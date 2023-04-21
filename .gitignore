@@ -1,3 +1,7 @@
 **/temp_uploaded_files
 **/temp_processed_data
+**/__pycache__
+**/.vscode
+**/.ipynb_checkpoints
 *.ipynb
+
