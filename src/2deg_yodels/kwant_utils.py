@@ -259,8 +259,6 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
     lat = kw.lattice.square(a)
 
     ##### Defining the tight binding model #####
-    lead_coords *= um_to_nm
-
     qpc = make_system(
         interpolated_potential,
         lat,
@@ -268,6 +266,8 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
         maxx * um_to_nm,
         miny * um_to_nm,
         maxy * um_to_nm,
+        lead_coords[0] * um_to_nm,
+        lead_coords[1] * um_to_nm,
         a=a,
         t=1 / a**2,
         T=T,
@@ -277,21 +277,14 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
     return qpc
 
 
-def plot_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts):
-    qpc = make_kwant_system(
-        discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts
-    )
-
+def plot_kwant_system(qpc):
+    
     ###### A plot of the system #####
     return kw.plot(qpc)
 
 
-def plot_kwant_potential(
-    discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts
-):
-    qpc = make_kwant_system(
-        discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts
-    )
+def plot_kwant_potential(discretised_gates, qpc):
+
     interpolated_potential = get_interpolated_potential(discretised_gates)
 
     def qpc_potential(site):  # potential in the scattering region
