@@ -312,7 +312,9 @@ def plot_kwant_info(qpc, info_type='bands', lead_num=0):
 
 
 def get_kwant_transmission(qpc, energy=0, lead_out=1, lead_in=0):
-
+    """
+    returns the transmission in units of 2e^2/h
+    """
     fqpc = _finalise_kwant_system(qpc)
     smatrix = kw.smatrix(fqpc, energy, in_leads=[0])
     return smatrix.transmission(lead_out, lead_in)
