@@ -295,10 +295,26 @@ def plot_kwant_potential(discretised_gates, qpc):
     )
 
 
+def _finalise_kwant_system(qpc):
+    return qpc.finalized()
 
 
-# ##### Finalise system #####
-# fqpc = qpc.finalized()
+def plot_kwant_info(qpc, info_type='bands', lead_num=0):
 
-# # ##### Electronic band strucure of the first lead #####
-# # kw.plotter.bands(fqpc.leads[0]);
+    fqpc = _finalise_kwant_system(qpc)
+
+    if info_type == 'bands':
+        return kw.plotter.bands(fqpc.leads[lead_num])
+    elif info_type == 'current':
+        return kw.plotter.current(fqpc.leads[lead_num])
+    elif info_type == 'density':
+        return kw.plotter.density(fqpc.leads[lead_num])
+
+
+def get_kwant_transmission(qpc, energy=0, lead_out=1, lead_in=0):
+
+    fqpc = _finalise_kwant_system(qpc)
+    smatrix = kw.smatrix(fqpc, energy, in_leads=[0])
+    return smatrix.transmission(lead_out, lead_in)
+
+
