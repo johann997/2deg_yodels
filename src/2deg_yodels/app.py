@@ -22,11 +22,15 @@ from utils import (
     plot_polyline,
 )
 
-UPLOAD_DIRECTORY = f"{os.getcwd()}/temp_uploaded_files"
+cwd = os.getcwd()
+base = cwd.split('2deg_yodels')[0]
+path_to_save = f'{base}2deg_yodels/src/2deg_yodels'
+
+UPLOAD_DIRECTORY = f"{path_to_save}/temp_uploaded_files"
 if not os.path.exists(UPLOAD_DIRECTORY):
     os.makedirs(UPLOAD_DIRECTORY)
 
-PROCESSED_DIRECTORY = f"{os.getcwd()}/temp_processed_data"
+PROCESSED_DIRECTORY = f"{path_to_save}/temp_processed_data"
 if not os.path.exists(PROCESSED_DIRECTORY):
     os.makedirs(PROCESSED_DIRECTORY)
 
