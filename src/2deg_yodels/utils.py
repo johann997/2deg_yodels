@@ -15,6 +15,10 @@ import plotly.io as pio
 # pio.renderers.default = "notebook_connected"
 
 
+
+############################################################
+#####              PLOTLY DEFAULT LAYOUTS              #####
+############################################################
 default_layout = dict(
     template="plotly_white",
     xaxis=dict(
@@ -33,6 +37,15 @@ default_layout = dict(
 
 
 def apply_default_layout(fig):
+    """
+    Applies the layout specified by the dict default_layout.
+
+    Args:
+        fig (fig): 
+
+    Returns:
+        fig: 
+    """
     fig.update_layout(**default_layout)
     fig.update_xaxes(default_layout["xaxis"])
     fig.update_yaxes(default_layout["yaxis"])
@@ -40,6 +53,12 @@ def apply_default_layout(fig):
 
 
 def default_fig():
+    """
+    Callable function to create default fig. Applies changes with apply_default_layout()
+
+    Returns:
+        fig: 
+    """
     fig = go.Figure()
     apply_default_layout(fig)
     return fig
@@ -65,6 +84,22 @@ def plot_discretised_gates(
     color_range=None,
     plot_3d=False,
 ):
+    """
+    General plotting function, takes discretised_gates data and handles how it should be plotted. 
+
+    Args:
+        discretised_gates (dict): _description_
+        plot_info (dict): _description_
+        plot_type (str, optional): Which key to plot in discretised_gates. Defaults to "coordinates".
+        plot (bool, optional): _description_. Defaults to True.
+        colorscale (str, optional): Colorscale of heatmap. Defaults to "Greens".
+        color_range (_type_, optional): Force color range of heatmap. Defaults to None which gives the range
+        [np.min(z_data), np.maax(z_data)]
+        plot_3d (bool, optional): Plot a 3d surface, useful for looking at potential landscape. Defaults to False.
+
+    Returns:
+        fig:
+    """
     x_axis = discretised_gates["x_axis"]
     y_axis = discretised_gates["y_axis"]
 
@@ -127,16 +162,6 @@ def plot_discretised_gates(
             )
         )
 
-        # heatmap_trace.colorbar.update(dict(outlinewidth=0, thickness=15, len=1))
-        # heatmap_trace.colorbar.update_z(zmin=np.min(z_data))
-        # heatmap_trace.update_z(z=np.min(z_data))
-
-        # fig.update_layout(
-        #     autosize=False,
-        #     scene_camera_eye=dict(x=1.87, y=0.88, z=-0.64),
-        #     margin=dict(l=65, r=50, b=65, t=90),
-        # )
-
     fig.update_layout(
         #         title=f'Plotting {dxf_file}',
         yaxis_zeroline=True,
@@ -159,7 +184,73 @@ def plot_discretised_gates(
     return fig
 
 
+
+
+def get_discretised_gates(plot_info, polyline_gates):
+    """
+    Create discretised_gates dict from polyline_gates
+
+    Args:
+        plot_info (dict): _description_
+        polyline_gates (dict): _description_
+
+    Returns:
+        dict: discretised_gates gates format used by other functions to store info about
+        the location of gates
+    """
+    discretised_gates = {}
+    nx = plot_info["nx"]
+    ny = plot_info["ny"]
+
+    x_axis = np.linspace(np.min(plot_info["x_range"]), np.max(plot_info["x_range"]), nx)
+    y_axis = np.linspace(np.min(plot_info["y_range"]), np.max(plot_info["y_range"]), ny)
+    z_data = np.zeros((ny, nx))
+
+    xx_axis, yy_axis = np.meshgrid(x_axis, y_axis)
+    coors = np.hstack(
+        (xx_axis.reshape(-1, 1), yy_axis.reshape(-1, 1))
+    )  # coors.shape is (4000000,2)
+
+    gate_num = 0
+    for key, val in polyline_gates.items():
+        x_data = val["x_array"]
+        y_data = val["y_array"]
+
+        poly_path = Path(np.stack((x_data, y_data), axis=1))
+        mask = poly_path.contains_points(coors)
+        mask_2d = np.reshape(mask, (-1, nx))
+
+        x_data = xx_axis[mask_2d]
+        y_data = yy_axis[mask_2d]
+
+        if np.sum(mask_2d.astype(int)) > 0:
+            gate_dict = {
+                "coordinates": mask_2d.astype(int),
+                "gate_val": 1,
+            }
+            discretised_gates[f"val_{gate_num}"] = gate_dict
+            gate_num += 1
+            z_data = z_data + mask_2d.astype(int)
+
+    discretised_gates["x_axis"] = x_axis
+    discretised_gates["y_axis"] = y_axis
+
+    return discretised_gates
+
+
+
 def get_potential_from_gate(discretised_gates, material_info):
+    """
+    Calculate the potential at the 2deg_depth specified in material_info using 
+    Davies (1995) update discretised_gates with new key potential.
+
+    Args:
+        discretised_gates (dict): _description_
+        material_info (dict): _description_
+
+    Returns:
+        dict: Updated discretised_gates dict with new key giving potential all all grid points. 
+    """
     x_axis = discretised_gates["x_axis"]
     y_axis = discretised_gates["y_axis"]
     del_x_half = np.abs((x_axis[1] - x_axis[0]) / 2)
@@ -201,9 +292,22 @@ def get_potential_from_gate(discretised_gates, material_info):
     return discretised_gates
 
 
+
+############################################################
+#####          SAVING AND RAEADING DATA TO CSV         #####
+############################################################
 def save_geometric_potential_to_csv(
     discretised_gates, csv_name="temp_processed_data/geometric_potential.csv"
 ):
+    """
+    Save the dict discretised_gates to a .csv so data can be read back at a later time. 
+    The dict contains information in 2d arrays which have to be flattened to store in .csv
+
+    Args:
+        discretised_gates (dict): 
+        csv_name (str, optional): Name of .csv to save to. 
+        Defaults to "temp_processed_data/geometric_potential.csv".
+    """
     csv_df = pd.DataFrame([])
 
     gate_num = 0
@@ -229,12 +333,35 @@ def save_geometric_potential_to_csv(
 
 
 def get_1d_to_2d(array, nx, ny):
+    """
+    Reshape a 1d array to 2d given numpts in x and y direction
+    Args:
+        array (np.array()): 1d array
+        nx (int): Numpts in x-direction
+        ny (int): Numpts in y-direction
+
+    Returns:
+        np.array: 2d array
+    """
     return np.array(array).reshape(ny, nx)
 
 
 def get_discretised_gates_from_csv(
     nx, ny, csv_name="temp_processed_data/geometric_potential.csv"
 ):
+    """
+    Read .csv and return a dict containing coordinates of gates.
+    The data is 2d but flattened before saved to .csv so nx and ny are used to reshape the data.
+
+    Args:
+        nx (int): Numpts in x-direction
+        ny (int): Numpts in y-direction
+        csv_name (str, optional): Name of .csv containing info. 
+        Defaults to "temp_processed_data/geometric_potential.csv".
+
+    Returns:
+        dict: discretised_gates
+    """
     df = pd.read_csv(csv_name)
     column_names = df.columns
 
@@ -259,46 +386,6 @@ def get_discretised_gates_from_csv(
     return copy.deepcopy(discretised_gates)
 
 
-def get_discretised_gates(plot_info, polyline_gates):
-    discretised_gates = {}
-    nx = plot_info["nx"]
-    ny = plot_info["ny"]
-
-    x_axis = np.linspace(np.min(plot_info["x_range"]), np.max(plot_info["x_range"]), nx)
-    y_axis = np.linspace(np.min(plot_info["y_range"]), np.max(plot_info["y_range"]), ny)
-    z_data = np.zeros((ny, nx))
-
-    xx_axis, yy_axis = np.meshgrid(x_axis, y_axis)
-    coors = np.hstack(
-        (xx_axis.reshape(-1, 1), yy_axis.reshape(-1, 1))
-    )  # coors.shape is (4000000,2)
-
-    gate_num = 0
-    for key, val in polyline_gates.items():
-        x_data = val["x_array"]
-        y_data = val["y_array"]
-
-        poly_path = Path(np.stack((x_data, y_data), axis=1))
-        mask = poly_path.contains_points(coors)
-        mask_2d = np.reshape(mask, (-1, nx))
-
-        x_data = xx_axis[mask_2d]
-        y_data = yy_axis[mask_2d]
-
-        if np.sum(mask_2d.astype(int)) > 0:
-            gate_dict = {
-                "coordinates": mask_2d.astype(int),
-                "gate_val": 1,
-            }
-            discretised_gates[f"val_{gate_num}"] = gate_dict
-            gate_num += 1
-            z_data = z_data + mask_2d.astype(int)
-
-    discretised_gates["x_axis"] = x_axis
-    discretised_gates["y_axis"] = y_axis
-
-    return discretised_gates
-
 
 def get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny):
     max_range = np.max([maxy - miny, maxx - minx])
@@ -320,14 +407,33 @@ def get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny):
 
 
 def save_file(name, content, upload_directory):
-    """Decode and store a file uploaded with Plotly Dash."""
+    """
+    Decode and store a file uploaded with Plotly Dash."
+
+    Args:
+        name (str): name of .dxf contiining polyline data
+        content (data): data read by Dash
+        upload_directory (str): ile path to .dxf
+    """
     if name is not None:
         data = content.encode("utf8").split(b";base64,")[1]
         with open(os.path.join(upload_directory, name), "wb") as fp:
             fp.write(base64.decodebytes(data))
 
 
+############################################################
+#####                  DXF TO POLYLINE                 #####
+############################################################
 def save_dxf_to_csv(name, upload_directory):
+    """
+    Reead a .dxf with 'name' at file path upload_directory. Create polylines from 
+    .dxf and save to .csv every two columns represent a seperate gate in the .dxf
+    even columns are x-coordinates and odd columns are y-coordinates.
+
+    Args:
+        name (str): name of .dxf contiining polyline data
+        upload_directory (sr): file path to .dxf
+    """
     file_path = f"{upload_directory}/{name}"
     doc = ezdxf.readfile(file_path)
     msp = doc.modelspace()
@@ -350,6 +456,17 @@ def save_dxf_to_csv(name, upload_directory):
 
 
 def read_csv_to_polyline(name, upload_directory):
+    """
+    Read a dict of polyline data read from .csv with 'name' at file path
+    'upload_directory'
+    Args:
+        name (str): name of .csv contiining polyline data
+        upload_directory (str): file path to .csv
+
+    Returns:
+        dict: each key represents a different gate each gate contains a sub
+        dict with key x_array and y_array which are the coordinates of the polyline points
+    """
     csv_name = f"{upload_directory}/{name.split('.')[0]}.csv"
     df = pd.read_csv(csv_name)
     column_names = df.columns
@@ -373,6 +490,17 @@ def read_csv_to_polyline(name, upload_directory):
 
 
 def plot_polyline(name, upload_directory, dxf_file=""):
+    """
+    Plots a figure using the polyline data stored in the .csv 'name'
+
+    Args:
+        name (str): name of .csv contiining polyline data
+        upload_directory (str): file path to .csv
+        dxf_file (str, optional): Used to add name to plot title. Defaults to "".
+
+    Returns:
+        fig: 
+    """
     polyline_gates = read_csv_to_polyline(name, upload_directory)
 
     fig = default_fig()
@@ -408,7 +536,15 @@ def plot_polyline(name, upload_directory, dxf_file=""):
 
 
 def uploaded_files(upload_directory):
-    """List the files in the upload directory."""
+    """
+    List the files in the upload directory.
+
+    Args:
+        upload_directory (str): File path of temp folder used to store data in app
+
+    Returns:
+        _type_: _description_
+    """
     files = []
     for filename in os.listdir(upload_directory):
         path = os.path.join(upload_directory, filename)
@@ -423,5 +559,15 @@ def uploaded_files(upload_directory):
 ############################
 
 def reduce_multiple(array):
-    "Divide array by greatest common divider"
+    """
+    Returns an array of ints divided by greatest common divider
+    e.g.
+    np.array([10,20,30]) -> np.array([1,2,3])
+
+    Args:
+        array (np.array): 
+
+    Returns:
+        np.array: _description_
+    """
     return (array / np.gcd.reduce(array)).astype(int)
