@@ -91,7 +91,7 @@ def update_discretised_gates(
 
 
 ###################################
-##### updating discretisation #####
+#####   calculate potential   #####
 ###################################
 @app.callback(
     Output("dummy2", "children"),

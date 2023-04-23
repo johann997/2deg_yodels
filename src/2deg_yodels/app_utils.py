@@ -1,6 +1,3 @@
-# import dash_core_components as dcc
-# import dash_html_components as html
-# from dash.dependencies import Input, Output, State
 import numpy as np
 from dash import Dash
 from dash import dcc
@@ -9,6 +6,16 @@ from dash.dependencies import Input, Output, State
 
 
 def create_n_sliders(num_sliders, app_layout):
+    """
+    Create num_sliders number of sliders. Each with key val_{i}-potential-slider
+
+    Args:
+        num_sliders (int): Number of sliders
+        app_layout (html.Div()): input app_layout
+
+    Returns:
+        html.Div(): sliders are saved to html.Div and appended to input app_layout
+    """
     slider_layouts = []
     app_inputs = []
 
@@ -43,7 +50,19 @@ def create_n_sliders(num_sliders, app_layout):
     return app_layout, app_inputs
 
 
+
 def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
+    """
+    Create base app layout
+
+    Args:
+        initial_fig (fig): fig to show before any data has been run
+        UPLOAD_DIRECTORY (str): file path to save files
+
+    Returns:
+         html.Div: how app should be constructed
+         list(Input()): Inputs of app
+    """
     num_sliders = 20
     fig_style = {"verticalAlign": "middle", "width": "70vh", "height": "70vh"}
     # Dash Layouts
