@@ -23,6 +23,7 @@ from utils import (
     save_dxf_to_csv,
     read_csv_to_polyline,
     plot_polyline,
+    fig_to_uri
 )
 
 from kwant_utils import (
@@ -227,8 +228,9 @@ def update_kwant_system(
         qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts)
 
         fig = plot_kwant_system(qpc)
+        out_fig = fig_to_uri(fig)
 
-        return fig
+        return out_fig
     else:
         return default_fig()
 

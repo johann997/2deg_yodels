@@ -281,7 +281,7 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
 def plot_kwant_system(qpc):
     
     ###### A plot of the system #####
-    return kw.plot(qpc)
+    return kw.plotter.plot(qpc, show=False)
 
 
 def plot_kwant_potential(discretised_gates, qpc):

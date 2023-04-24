@@ -1,5 +1,6 @@
 import os
 import base64
+from io import BytesIO
 import copy
 import ezdxf  # pip install ezdxf https://pypi.org/project/ezdxf/
 
@@ -12,9 +13,10 @@ import plotly
 import plotly.graph_objects as go
 import plotly.io as pio
 
+import matplotlib.pyplot, matplotlib.backends 
+import matplotlib.pyplot as plt
+
 # pio.renderers.default = "notebook_connected"
-
-
 
 ############################################################
 #####              PLOTLY DEFAULT LAYOUTS              #####
@@ -291,6 +293,26 @@ def get_potential_from_gate(discretised_gates, material_info):
 
     return discretised_gates
 
+
+
+def fig_to_uri(in_fig, close_all=True, **save_args):
+    """
+    Save a figure as a URI, to show matplotlib figs in Dash
+    Args:
+        in_fig (plt.Figure): matplotlib figure
+        close_all (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        str: 
+    """
+    out_img = BytesIO()
+    in_fig.savefig(out_img, format='png', **save_args)
+    if close_all:
+        in_fig.clf()
+        plt.close('all')
+    out_img.seek(0)  # rewind file
+    encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
+    return "data:image/png;base64,{}".format(encoded)
 
 
 ###########################################################
