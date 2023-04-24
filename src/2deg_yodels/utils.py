@@ -287,15 +287,15 @@ def get_potential_from_gate(discretised_gates, material_info):
                         g4 = get_g(-xx_axis + R, -yy_axis + T)
                         potential_data += g1 + g2 + g3 + g4
 
-            discretised_gates[key]["potential"] = potential_data * val["gate_val"]
+            discretised_gates[key]["potential"] = potential_data
 
     return discretised_gates
 
 
 
-############################################################
-#####          SAVING AND RAEADING DATA TO CSV         #####
-############################################################
+###########################################################
+#####          SAVING AND READING DATA TO CSV         #####
+###########################################################
 def save_geometric_potential_to_csv(
     discretised_gates, csv_name="temp_processed_data/geometric_potential.csv"
 ):
@@ -555,7 +555,7 @@ def uploaded_files(upload_directory):
 
 
 ############################
-##### MATH #####
+#####       MATH       #####
 ############################
 
 def reduce_multiple(array):

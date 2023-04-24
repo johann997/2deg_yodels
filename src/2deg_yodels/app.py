@@ -41,6 +41,9 @@ app = Dash(__name__)
 app.layout = html.Div(app_layout)
 
 
+#######################################################
+##### save .dxf to UPLOAD_DIRECTORY and plot data #####
+#######################################################
 @app.callback(
     Output("initial-gate-graph", "figure"),
     Input("upload-data", "filename"),
