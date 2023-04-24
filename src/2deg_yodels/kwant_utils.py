@@ -3,7 +3,11 @@ import kwant as kw
 from scipy.interpolate import interp2d
 import numpy as np
 
-from utils import default_fig, reduce_multiple
+from utils import (
+    default_fig, 
+    reduce_multiple, 
+    get_xyz_from_discretised_gates
+    )
 
 
 # constants
@@ -33,29 +37,6 @@ def get_lattice_constant(minx, maxx, miny, maxy, numpts=100):
         a = y_range / numpts
 
     return a
-
-
-def get_xyz_from_discretised_gates(gates, data_type="potential"):
-    """
-    Return x and y array and z array which is the sum of all z_data stored in discretised_gates
-    under the key data_type
-    """
-
-    x_data = gates["x_axis"]
-    y_data = gates["y_axis"]
-    z_data = np.zeros((np.shape(y_data)[0], np.shape(x_data)[0]))
-
-    index = -1
-    for key, val in gates.items():
-        if "val_" in key:
-            index += 1
-            gate_val = gates[key]["gate_val"]
-            if data_type == "potential":
-                z_data += gates[key][data_type] * gate_val
-            else:
-                z_data += gates[key][data_type]
-
-    return x_data, y_data, z_data
 
 
 def on_perimeter(x, y, x_array, y_array):

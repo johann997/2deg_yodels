@@ -106,18 +106,10 @@ def plot_discretised_gates(
     Returns:
         fig:
     """
-    x_axis = discretised_gates["x_axis"]
-    y_axis = discretised_gates["y_axis"]
-
     fig = default_fig()
 
-    z_data = np.zeros((np.shape(y_axis)[0], np.shape(x_axis)[0]))
-    gate_data = np.zeros((np.shape(y_axis)[0], np.shape(x_axis)[0]))
-
-    for key, val in discretised_gates.items():
-        if "val_" in key:
-            z_data += val[plot_type] * val["gate_val"]
-            gate_data += val["coordinates"]
+    x_axis, y_axis, z_data = get_xyz_from_discretised_gates(discretised_gates, data_type=plot_type)
+    x_axis, y_axis, gate_data = get_xyz_from_discretised_gates(discretised_gates, data_type="coordinates")
 
     if plot_type == 'potential':
         z_data *= electron_charge
@@ -588,6 +580,28 @@ def uploaded_files(upload_directory):
 ############################
 #####       MATH       #####
 ############################
+def get_xyz_from_discretised_gates(gates, data_type="potential"):
+    """
+    Return x and y array and z array which is the sum of all z_data stored in discretised_gates
+    under the key data_type
+    """
+
+    x_data = gates["x_axis"]
+    y_data = gates["y_axis"]
+    z_data = np.zeros((np.shape(y_data)[0], np.shape(x_data)[0]))
+
+    index = -1
+    for key, val in gates.items():
+        if "val_" in key:
+            index += 1
+            gate_val = gates[key]["gate_val"]
+            if data_type == "potential":
+                z_data += gates[key][data_type] * gate_val
+            else:
+                z_data += gates[key][data_type]
+
+    return x_data, y_data, z_data
+
 
 def reduce_multiple(array):
     """

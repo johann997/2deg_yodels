@@ -23,7 +23,8 @@ from utils import (
     save_dxf_to_csv,
     read_csv_to_polyline,
     plot_polyline,
-    fig_to_uri
+    fig_to_uri,
+    get_xyz_from_discretised_gates,
 )
 
 from kwant_utils import (
@@ -170,7 +171,7 @@ def update_potential(
                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
-        color_range = [np.min(z_data), np.max(z_data)]
+        # color_range = [np.min(z_data), np.max(z_data)]
         plot_info = get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny)
         potential_fig = plot_discretised_gates(
             discretised_gates,
@@ -178,7 +179,7 @@ def update_potential(
             plot_type="potential",
             plot=False,
             colorscale="Plotly3",
-            color_range=color_range,
+            # color_range=color_range,
         )
 
         return potential_fig
