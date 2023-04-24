@@ -205,6 +205,13 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="min numpts",
                     value=25,
                 ),
+                html.H4("Excitation energy at which to solve the scattering problem."),
+                dcc.Input(
+                    id="energy-kwant-simulation",
+                    type="number",
+                    placeholder="min numpts",
+                    value=0.1,
+                ),
                 html.H5("Gate 1 [id, min, max]"),
                 dcc.Input(
                     id="gate1-id",
