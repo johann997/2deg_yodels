@@ -13,10 +13,11 @@ h = 6.626e-34  # Planck constant (Js)
 nm = 1e-9  # nanometres
 um_to_nm = 1e-6 / nm  # convert micrometres to nanometres
 ms = 0.067 * 9.109e-31  # an effective mass of electrons in 2DEG
-
-T = (
-    hb * hb / 2 / nm / nm / ms / e
-)  # constant to convert from eV (output of nn++) to kwant energy unit
+e_mass = 9.109*10e-31 # electron mass in kg
+T = 1
+# T = (
+#     hb * hb / 2 / nm / nm / ms / e
+# )  # constant to convert from eV (output of nn++) to kwant energy unit
 
 
 def get_lattice_constant(minx, maxx, miny, maxy, numpts=100):
@@ -150,11 +151,15 @@ def make_system(
     def onsite(site):
         "set the onsite terms"
         x, y = site.pos
-        return 4 * t - -interpolated_potential(x, y)[0] / T
+        return 4 * t - interpolated_potential(x, y)[0] / T
+    
+    def onsite_lead(site):
+        "set the onsite terms for the lead"
+        return 4 * t 
 
     def hopping(*args):
         "set the onsite terms"
-        return -t
+        return - t
 
     x_lattice_spacing = np.arange(minx // a + 1, maxx // a, 1)  # CHECK: spacing 1 or a
     y_lattice_spacing = np.arange(miny // a + 1, maxy // a, 1)
@@ -164,7 +169,9 @@ def make_system(
 
     syst = kw.Builder()
 
+    ######################################
     ##### setting up the bulk system #####
+    ######################################
     for x in x_lattice_spacing:
         for y in y_lattice_spacing:
             site = lat(x, y)
@@ -172,7 +179,9 @@ def make_system(
 
     syst[lat.neighbors()] = hopping
 
+    ############################
     ##### setting up leads #####
+    ############################
     for lead_coords in [lead1_coords, lead2_coords]:
         # get lead coords in lattice space
         lead_coords = get_closest_coordinates(
@@ -188,14 +197,11 @@ def make_system(
             dist=dist,
         )
 
-        x0, y0 = lead_coords[0], lead_coords[1]
-
         sym_lead = kw.TranslationalSymmetry((a * x_periodicity, a * y_periodicity))
         lead = kw.Builder(sym_lead)
 
         x0, y0 = lead_coords[0], lead_coords[1]  # lattice coordinate of starting lead
 
-        ##### not using lead_shape #####
         if x_periodicity == 0:
             ##### setting up a vertical lead system #####
             lead_indexs = np.where(
@@ -207,7 +213,7 @@ def make_system(
             )
             y = y_lead_lattice
 
-            lead[(lat(x, y) for x in x_lead_lattice_spacing)] = onsite
+            lead[(lat(x, y) for x in x_lead_lattice_spacing)] = onsite_lead
             lead[lat.neighbors()] = hopping
 
         else:
@@ -221,7 +227,7 @@ def make_system(
             )
             x = x_lead_lattice
 
-            lead[(lat(x, y) for y in y_lead_lattice_spacing)] = onsite
+            lead[(lat(x, y) for y in y_lead_lattice_spacing)] = onsite_lead
             lead[lat.neighbors()] = hopping
 
         #         kw.plot(lead)
@@ -264,7 +270,7 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
         lead_coords[0] * um_to_nm,
         lead_coords[1] * um_to_nm,
         a=a,
-        t=1 / a**2,
+        t=1,
         T=T,
         dist=0.1,
     )
