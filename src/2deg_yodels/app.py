@@ -189,7 +189,7 @@ def update_potential(
 ##### creating kwant system #####
 #################################
 @app.callback(
-    Output("kwant-system", "figure"),
+    Output("kwant-system", component_property='src'),
     Input("update-kwant-system", "n_clicks"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
@@ -232,7 +232,7 @@ def update_kwant_system(
 
         return out_fig
     else:
-        return default_fig()
+        return ""
 
 #################################
 ##### running kwant system  #####

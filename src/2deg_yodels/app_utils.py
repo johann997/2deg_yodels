@@ -188,6 +188,8 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                 ),
                 html.Button("Plot System", id="update-kwant-system"),
                 html.Img(id = 'kwant-system"', src = ''),
+                html.Div([html.Img(id = 'kwant-system', src = '')],
+                            id='kwant-system-plot-div'),
                 # dcc.Graph(
                 #     id="kwant-system", figure=initial_fig, style=fig_style
                 # ),
