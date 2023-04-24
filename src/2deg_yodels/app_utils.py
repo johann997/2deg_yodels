@@ -137,13 +137,35 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     id="discretised-gate-graph", figure=initial_fig, style=fig_style
                 ),
                 html.Button("Update Potential", id="update-potential"),
-                html.H2("Transport Simulation"),
-                html.H5("Lead coordinates"),
+            ]
+        ),
+        html.Div(id="dummy1"),
+        html.Div(id="dummy2"),
+    ]
+
+
+    potential_layout = [
+        html.Div(
+            [
+                html.H4("Potential chane in 2DEG"),
+                dcc.Graph(id="potential-graph"),
+            ],
+            style={"width": "59%", "height": "59%", "display": "inline-block"},
+        )
+    ]
+
+
+    kwant_layout = [
+        html.Div(
+            [
+                            html.H2("Transport Simulation"),
+                html.H4("Lead coordinates"),
+                html.H5("Lead 1 [x, y]"),
                 dcc.Input(
                     id="lead1-x",
                     type="number",
                     placeholder="x coordinate",
-                    value=0.5,
+                    value=9.6,
                 ),
                 dcc.Input(
                     id="lead1-y",
@@ -151,23 +173,26 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="y coordinate",
                     value=0.5,
                 ),
+                html.H5("Lead 2 [x, y]"),
                 dcc.Input(
                     id="lead2-x",
                     type="number",
                     placeholder="x coordinate",
-                    value=0.5,
+                    value=9.6,
                 ),
                 dcc.Input(
                     id="lead2-y",
                     type="number",
                     placeholder="y coordinate",
-                    value=0.5,
+                    value=1.25,
                 ),
                 html.Button("Plot System", id="update-kwant-system"),
-                dcc.Graph(
-                    id="kwant-system", figure=initial_fig, style=fig_style
-                ),
-                html.H5("Run charge stability diagram"),
+                html.Img(id = 'kwant-system"', src = ''),
+                # dcc.Graph(
+                #     id="kwant-system", figure=initial_fig, style=fig_style
+                # ),
+                html.H4("Run charge stability diagram"),
+                html.H5("Gate 1 [id, min, max]"),
                 dcc.Input(
                     id="gate1-id",
                     type="number",
@@ -186,6 +211,8 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="gate value max",
                     value=0,
                 ),
+                html.Button("Run Pinch off (1d plot)", id="run-kwant-system-1d", n_clicks=0),
+                html.H5("Gate 2 [id, min, max]"),
                 dcc.Input(
                     id="gate2-id",
                     type="number",
@@ -204,28 +231,16 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="gate value max",
                     value=0,
                 ),
-                html.Button("Run Pinch off (gate 1 vals)", id="run-kwant-system-1d", n_clicks=0),
-                html.Button("Run Charge Stability", id="run-kwant-system-2d", n_clicks=0),
+                html.Button("Run Charge Stability (2d plot)", id="run-kwant-system-2d", n_clicks=0),
                 dcc.Graph(
                     id="kwant-simulation", figure=initial_fig, style=fig_style
                 ),
-            ]
-        ),
-        html.Div(id="dummy1"),
-        html.Div(id="dummy2"),
-    ]
-
-    potential_layout = [
-        html.Div(
-            [
-                html.H4("Potential chane in 2DEG"),
-                dcc.Graph(id="potential-graph"),
             ],
             style={"width": "59%", "height": "59%", "display": "inline-block"},
         )
     ]
 
     potential_layout, app_inputs = create_n_sliders(num_sliders, potential_layout)
-    app_layout = setup_layout + potential_layout
+    app_layout = setup_layout + potential_layout + kwant_layout
 
     return app_layout, app_inputs
