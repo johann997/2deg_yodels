@@ -240,6 +240,7 @@ def update_kwant_system(
 @app.callback(
     Output("kwant-simulation", "figure"),
     Input("run-kwant-system-1d", "n_clicks"),
+    Input("run-kwant-system-2d", "n_clicks"),
     State("numpts-kwant-system", "value"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
