@@ -137,6 +137,77 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     id="discretised-gate-graph", figure=initial_fig, style=fig_style
                 ),
                 html.Button("Update Potential", id="update-potential"),
+                html.H2("Transport Simulation"),
+                html.H5("Lead coordinates"),
+                dcc.Input(
+                    id="lead1-x",
+                    type="number",
+                    placeholder="x coordinate",
+                    value=0.5,
+                ),
+                dcc.Input(
+                    id="lead1-y",
+                    type="number",
+                    placeholder="y coordinate",
+                    value=0.5,
+                ),
+                dcc.Input(
+                    id="lead2-x",
+                    type="number",
+                    placeholder="x coordinate",
+                    value=0.5,
+                ),
+                dcc.Input(
+                    id="lead2-y",
+                    type="number",
+                    placeholder="y coordinate",
+                    value=0.5,
+                ),
+                html.Button("Plot System", id="update-kwant-system"),
+                dcc.Graph(
+                    id="kwant-system", figure=initial_fig, style=fig_style
+                ),
+                html.H5("Run charge stability diagram"),
+                dcc.Input(
+                    id="gate1-id",
+                    type="number",
+                    placeholder="gate number",
+                    value=0,
+                ),
+                dcc.Input(
+                    id="gate1-min",
+                    type="number",
+                    placeholder="gate value min",
+                    value=-1,
+                ),
+                dcc.Input(
+                    id="gate1-max",
+                    type="number",
+                    placeholder="gate value max",
+                    value=0,
+                ),
+                dcc.Input(
+                    id="gate2-id",
+                    type="number",
+                    placeholder="gate number",
+                    value=0,
+                ),
+                dcc.Input(
+                    id="gate2-min",
+                    type="number",
+                    placeholder="gate value min",
+                    value=-1,
+                ),
+                dcc.Input(
+                    id="gate2-max",
+                    type="number",
+                    placeholder="gate value max",
+                    value=0,
+                ),
+                html.Button("Run Charge Stability", id="run-kwant-system"),
+                dcc.Graph(
+                    id="kwant-simulation", figure=initial_fig, style=fig_style
+                ),
             ]
         ),
         html.Div(id="dummy1"),
