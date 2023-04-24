@@ -197,6 +197,8 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                 # html.Img(id = 'kwant-system"', src = ''),
                 html.Div([html.Img(id = 'kwant-system', src = '')],
                             id='kwant-system-plot-div'),
+                html.Div([html.Img(id = 'kwant-band-structure', src = '')],
+                            id='kwant-band-structure-plot-div'),
                 html.H4("Run charge stability diagram"),
                 html.H4("Min number of points in simulation"),
                 dcc.Input(

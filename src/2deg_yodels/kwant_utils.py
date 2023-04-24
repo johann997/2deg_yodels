@@ -8,13 +8,13 @@ from utils import default_fig, reduce_multiple
 
 # constants
 e = 1.602e-19  # electron charge (C)
-hb = 6.626e-34 / 2 / np.pi  # Dirac constant (Js)
-h = 6.626e-34  # Planck constant (Js)
+hbar = 1.05e-34 # hbar
 nm = 1e-9  # nanometres
 um_to_nm = 1e-6 / nm  # convert micrometres to nanometres
-ms = 0.067 * 9.109e-31  # an effective mass of electrons in 2DEG
-e_mass = 9.109*10e-31 # electron mass in kg
-T = 1
+# hbar /= nm**2 # convert hbar to nm
+j_to_ev = 6.24e18 # convert J to eV
+effective_mass = 0.067 * 9.109e-31  # an effective mass of electrons in 2DEG
+T = e
 # T = (
 #     hb * hb / 2 / nm / nm / ms / e
 # )  # constant to convert from eV (output of nn++) to kwant energy unit
@@ -237,6 +237,16 @@ def make_system(
 
 
 def get_interpolated_potential(discretised_gates):
+    """
+    return interp2d object which is built from a 2d array of all the gates summed potential
+    distances are calculated in nm space
+
+    Args:
+        discretised_gates (dict): 
+
+    Returns:
+        interp2d: 
+    """
 
     discretised_gates_copy = copy.deepcopy(discretised_gates)
     x, y, potential = get_xyz_from_discretised_gates(
@@ -256,6 +266,8 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
     # lattice constant of the tight-binding system (nm)
     a = int(get_lattice_constant(minx, maxx, miny, maxy, numpts=numpts) * um_to_nm)
 
+    t  = (hbar**2 / (2 * effective_mass * (a*nm)**2)) * j_to_ev  # in units of Energy
+
     ##### Creating a square lattice #####
     lat = kw.lattice.square(a)
 
@@ -270,7 +282,7 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
         lead_coords[0] * um_to_nm,
         lead_coords[1] * um_to_nm,
         a=a,
-        t=1,
+        t=t,
         T=T,
         dist=0.1,
     )
@@ -291,7 +303,7 @@ def plot_kwant_potential(discretised_gates, qpc):
     def qpc_potential(site):  # potential in the scattering region
         x, y = site.pos
 
-        return -interpolated_potential(x, y)[0] / T
+        return - interpolated_potential(x, y)[0] / T
 
     return kw.plotter.map(
         qpc,
@@ -303,6 +315,15 @@ def plot_kwant_potential(discretised_gates, qpc):
 
 def _finalise_kwant_system(qpc):
     return qpc.finalized()
+
+
+def plot_kwant_band_structure(qpc, lead_num=0):
+
+    fqpc = _finalise_kwant_system(qpc)
+
+    return kw.plotter.bands(fqpc.leads[lead_num], show=False)
+
+    
 
 
 def plot_kwant_info(qpc, info_type='bands', lead_num=0):

@@ -31,7 +31,8 @@ from kwant_utils import (
     plot_kwant_system,
     plot_kwant_potential,
     plot_kwant_info,
-    get_kwant_transmission
+    get_kwant_transmission,
+    plot_kwant_band_structure,
 )
 
 cwd = os.getcwd()
@@ -233,6 +234,58 @@ def update_kwant_system(
         return out_fig
     else:
         return ""
+    
+
+#################################
+##### plotting kwant bands  #####
+#################################
+@app.callback(
+    Output("kwant-band-structure", component_property='src'),
+    Input("update-kwant-system", "n_clicks"),
+    State("numpts-kwant-system", "value"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("2deg-depth", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    app_inputs,
+)
+def update_kwant_band_structure(
+    update_kwant_band_structure, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+        z_data = 0
+        index = -1
+        for key, val in discretised_gates.items():
+            if "val_" in key:
+                index += 1
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
+
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
+
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+
+        fig = plot_kwant_band_structure(qpc)
+        out_fig = fig_to_uri(fig)
+
+        return out_fig
+    else:
+        return ""
+    
+
 
 #################################
 ##### running kwant system  #####
