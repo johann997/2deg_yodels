@@ -298,6 +298,7 @@ def get_potential_from_gate(discretised_gates, material_info):
 def fig_to_uri(in_fig, close_all=True, **save_args):
     """
     Save a figure as a URI, to show matplotlib figs in Dash
+    https://github.com/4QuantOSS/DashIntro/blob/master/notebooks/Tutorial.ipynb
     Args:
         in_fig (plt.Figure): matplotlib figure
         close_all (bool, optional): _description_. Defaults to True.

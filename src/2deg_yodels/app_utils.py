@@ -158,7 +158,14 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
     kwant_layout = [
         html.Div(
             [
-                            html.H2("Transport Simulation"),
+                html.H2("Transport Simulation"),
+                html.H4("Min number of points in each direction for tight binding"),
+                dcc.Input(
+                    id="numpts-kwant-system",
+                    type="number",
+                    placeholder="min numpts",
+                    value=100,
+                ),
                 html.H4("Lead coordinates"),
                 html.H5("Lead 1 [x, y]"),
                 dcc.Input(
@@ -187,13 +194,17 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     value=1.25,
                 ),
                 html.Button("Plot System", id="update-kwant-system"),
-                html.Img(id = 'kwant-system"', src = ''),
+                # html.Img(id = 'kwant-system"', src = ''),
                 html.Div([html.Img(id = 'kwant-system', src = '')],
                             id='kwant-system-plot-div'),
-                # dcc.Graph(
-                #     id="kwant-system", figure=initial_fig, style=fig_style
-                # ),
                 html.H4("Run charge stability diagram"),
+                html.H4("Min number of points in simulation"),
+                dcc.Input(
+                    id="numpts-kwant-simulation",
+                    type="number",
+                    placeholder="min numpts",
+                    value=25,
+                ),
                 html.H5("Gate 1 [id, min, max]"),
                 dcc.Input(
                     id="gate1-id",

@@ -191,6 +191,7 @@ def update_potential(
 @app.callback(
     Output("kwant-system", component_property='src'),
     Input("update-kwant-system", "n_clicks"),
+    State("numpts-kwant-system", "value"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
     State("lead2-x", "value"),
@@ -206,7 +207,7 @@ def update_potential(
     app_inputs,
 )
 def update_kwant_system(
-    update_kwant_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
+    update_kwant_system, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
@@ -223,9 +224,8 @@ def update_kwant_system(
         lead1_coords = np.array([lead1x, lead1y])
         lead2_coords = np.array([lead2x, lead2y])
         lead_coords = [lead1_coords, lead2_coords]
-        numpts = 100
 
-        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts)
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
 
         fig = plot_kwant_system(qpc)
         out_fig = fig_to_uri(fig)
@@ -240,6 +240,7 @@ def update_kwant_system(
 @app.callback(
     Output("kwant-simulation", "figure"),
     Input("run-kwant-system-1d", "n_clicks"),
+    State("numpts-kwant-system", "value"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
     State("lead2-x", "value"),
@@ -251,6 +252,8 @@ def update_kwant_system(
     State("gate2-min", "value"),
     State("gate2-max", "value"),
     State("2deg-depth", "value"),
+    State("numpts-kwant-simulation", "value"),
+    State("energy-kwant-simulation", "value"),
     State("min-x-potential", "value"),
     State("max-x-potential", "value"),
     State("min-y-potential", "value"),
@@ -261,7 +264,7 @@ def update_kwant_system(
     app_inputs,
 )
 def update_kwant_system(
-    update_kwant_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
+    update_kwant_system, numpts_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
@@ -278,12 +281,11 @@ def update_kwant_system(
         lead1_coords = np.array([lead1x, lead1y])
         lead2_coords = np.array([lead2x, lead2y])
         lead_coords = [lead1_coords, lead2_coords]
-        numpts_system = 100
 
         # looping for multiple gate vals
         gate1_name = f"val_{int(gate1id)}"
         gate2_name = f"val_{int(gate2id)}"
-        numpts_simulation = 50
+
         transmission_array = np.zeros((numpts_simulation, numpts_simulation))
         voltage1_array = np.linspace(gate1min, gate1max, numpts_simulation)
         voltage2_array = np.linspace(gate2min, gate2max, numpts_simulation)
@@ -293,7 +295,7 @@ def update_kwant_system(
 
             if "run-kwant-system-1d" == ctx.triggered_id:
                 qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
-                transmission = get_kwant_transmission(qpc, energy=0, lead_out=1, lead_in=0)
+                transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
                 transmission_array[0, v1_index] = transmission  
 
             elif "run-kwant-system-2d" == ctx.triggered_id:
@@ -301,7 +303,7 @@ def update_kwant_system(
                     discretised_gates[gate2_name]["gate_val"] = voltage_2
                     qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
 
-                    transmission = get_kwant_transmission(qpc, energy=0, lead_out=1, lead_in=0)
+                    transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
                     transmission_array[v2_index, v1_index] = transmission  
                 
 
