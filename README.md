@@ -19,6 +19,6 @@ To run this script, you'll need to set up a virtual environment and install the 
 
 
 5. Run the script:
-python run.py
+`python run.py`
 
 

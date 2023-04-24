@@ -6,6 +6,8 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 
+import kwant as kw
+
 from app_utils import create_app_layout, create_n_sliders
 
 from utils import (
@@ -20,6 +22,14 @@ from utils import (
     save_dxf_to_csv,
     read_csv_to_polyline,
     plot_polyline,
+)
+
+from kwant_utils import (
+    make_kwant_system,
+    plot_kwant_system,
+    plot_kwant_potential,
+    plot_kwant_info,
+    get_kwant_transmission
 )
 
 cwd = os.getcwd()
@@ -172,6 +182,58 @@ def update_potential(
     else:
         return default_fig()
 
+
+#################################
+##### creating kwant system #####
+#################################
+@app.callback(
+    Output("kwant-system", "figure"),
+    Input("update-kwant-system", "n_clicks"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("2deg-depth", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    app_inputs,
+)
+def update_kwant_system(
+    update_kwant_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+        z_data = 0
+        index = -1
+        for key, val in discretised_gates.items():
+            if "val_" in key:
+                index += 1
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
+
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
+        numpts = 100
+
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts)
+
+        fig = kw.plot(qpc)
+
+        return fig
+    else:
+        return default_fig()
+
+#################################
+##### running kwant system  #####
+#################################
 
 # run the app
 if __name__ == "__main__":
