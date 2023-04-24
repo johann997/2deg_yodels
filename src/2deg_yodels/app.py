@@ -4,9 +4,10 @@ import numpy as np
 from dash import Dash
 from dash import dcc
 from dash import html
+from dash import ctx
 from dash.dependencies import Input, Output, State
 
-import kwant as kw
+import plotly.graph_objects as go
 
 from app_utils import create_app_layout, create_n_sliders
 
@@ -225,7 +226,7 @@ def update_kwant_system(
 
         qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts)
 
-        fig = kw.plot(qpc)
+        fig = plot_kwant_system(qpc)
 
         return fig
     else:
@@ -234,6 +235,99 @@ def update_kwant_system(
 #################################
 ##### running kwant system  #####
 #################################
+@app.callback(
+    Output("kwant-simulation", "figure"),
+    Input("run-kwant-system-1d", "n_clicks"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("gate1-id", "value"),
+    State("gate1-min", "value"),
+    State("gate1-max", "value"),
+    State("gate2-id", "value"),
+    State("gate2-min", "value"),
+    State("gate2-max", "value"),
+    State("2deg-depth", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    app_inputs,
+)
+def update_kwant_system(
+    update_kwant_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+        z_data = 0
+        index = -1
+        for key, val in discretised_gates.items():
+            if "val_" in key:
+                index += 1
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
+
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
+        numpts_system = 100
+
+        # looping for multiple gate vals
+        gate1_name = f"val_{int(gate1id)}"
+        gate2_name = f"val_{int(gate2id)}"
+        numpts_simulation = 50
+        transmission_array = np.zeros((numpts_simulation, numpts_simulation))
+        voltage1_array = np.linspace(gate1min, gate1max, numpts_simulation)
+        voltage2_array = np.linspace(gate2min, gate2max, numpts_simulation)
+
+        for v1_index, voltage_1 in enumerate(voltage1_array):
+            discretised_gates[gate1_name]["gate_val"] = voltage_1
+
+            if "run-kwant-system-1d" == ctx.triggered_id:
+                qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+                transmission = get_kwant_transmission(qpc, energy=0, lead_out=1, lead_in=0)
+                transmission_array[0, v1_index] = transmission  
+
+            elif "run-kwant-system-2d" == ctx.triggered_id:
+                for v2_index, voltage_2 in enumerate(voltage2_array):
+                    discretised_gates[gate2_name]["gate_val"] = voltage_2
+                    qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+
+                    transmission = get_kwant_transmission(qpc, energy=0, lead_out=1, lead_in=0)
+                    transmission_array[v2_index, v1_index] = transmission  
+                
+
+        # setting up figure for plotting
+        fig = default_fig()
+
+        if "run-kwant-system-1d" == ctx.triggered_id:
+            fig.add_trace(
+                go.Scatter(
+                    x=voltage1_array,
+                    y=transmission_array[0],
+                )
+            )
+
+        elif "run-kwant-system-2d" == ctx.triggered_id:
+            fig.add_trace(
+                go.Heatmap(
+                    z=transmission_array,
+                    x=voltage1_array,
+                    y=voltage2_array,
+                    opacity=1,
+                )
+            )
+
+        return fig
+    else:
+        return default_fig()
+    
 
 # run the app
 if __name__ == "__main__":

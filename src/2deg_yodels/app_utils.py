@@ -204,7 +204,8 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="gate value max",
                     value=0,
                 ),
-                html.Button("Run Charge Stability", id="run-kwant-system"),
+                html.Button("Run Pinch off (gate 1 vals)", id="run-kwant-system-1d", n_clicks=0),
+                html.Button("Run Charge Stability", id="run-kwant-system-2d", n_clicks=0),
                 dcc.Graph(
                     id="kwant-simulation", figure=initial_fig, style=fig_style
                 ),
