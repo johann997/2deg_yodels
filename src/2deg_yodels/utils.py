@@ -18,6 +18,9 @@ import matplotlib.pyplot as plt
 
 # pio.renderers.default = "notebook_connected"
 
+# charge of electron
+electron_charge = 1.602e-19
+
 ############################################################
 #####              PLOTLY DEFAULT LAYOUTS              #####
 ############################################################
@@ -85,6 +88,7 @@ def plot_discretised_gates(
     colorscale="Greens",
     color_range=None,
     plot_3d=False,
+    electron_charge = electron_charge
 ):
     """
     General plotting function, takes discretised_gates data and handles how it should be plotted. 
@@ -114,6 +118,9 @@ def plot_discretised_gates(
         if "val_" in key:
             z_data += val[plot_type] * val["gate_val"]
             gate_data += val["coordinates"]
+
+    if plot_type == 'potential':
+        z_data *= electron_charge
 
     if color_range is None:
         zmin, zmax = np.min(z_data), np.max(z_data)
@@ -166,6 +173,7 @@ def plot_discretised_gates(
 
     fig.update_layout(
         #         title=f'Plotting {dxf_file}',
+        coloraxis_colorbar={'title':f'Voltage (eV)'},
         yaxis_zeroline=True,
         xaxis_zeroline=True,
         #                   width = 800,
