@@ -240,12 +240,13 @@ def get_interpolated_potential(discretised_gates):
     return interpolated_potential
 
 
-def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts):
+def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts, a=0):
 
     interpolated_potential = get_interpolated_potential(discretised_gates)
 
     # lattice constant of the tight-binding system (nm)
-    a = int(get_lattice_constant(minx, maxx, miny, maxy, numpts=numpts) * um_to_nm)
+    if a == 0:
+        a = int(get_lattice_constant(minx, maxx, miny, maxy, numpts=numpts) * um_to_nm)
 
     t  = (hbar**2 / (2 * effective_mass * (a*nm)**2)) * j_to_ev  # in units of Energy
 

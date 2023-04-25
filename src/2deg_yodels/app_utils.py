@@ -168,12 +168,12 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
         html.Div(
             [
                 html.H2("Transport Simulation"),
-                html.H4("Min number of points in each direction for tight binding"),
+                html.H4("Lattice constant (nm)"),
                 dcc.Input(
-                    id="numpts-kwant-system",
+                    id="lattice-constant-kwant-system",
                     type="number",
-                    placeholder="min numpts",
-                    value=100,
+                    placeholder="lattice constant (nm)",
+                    value=1,
                 ),
                 html.H4("Lead coordinates"),
                 html.H5("Lead 1 [x, y]"),

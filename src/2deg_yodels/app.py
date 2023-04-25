@@ -311,7 +311,7 @@ def update_potential(
 @app.callback(
     Output("kwant-system", component_property='src'),
     Input("update-kwant-system", "n_clicks"),
-    State("numpts-kwant-system", "value"),
+    State("lattice-constant-kwant-system", "value"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
     State("lead2-x", "value"),
@@ -328,7 +328,7 @@ def update_potential(
     # app_inputs,
 )
 def update_kwant_system(
-    update_kwant_system, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+    update_kwant_system, lattice_constant, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
@@ -353,7 +353,7 @@ def update_kwant_system(
         lead2_coords = np.array([lead2x, lead2y])
         lead_coords = [lead1_coords, lead2_coords]
 
-        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, 0, a=lattice_constant)
 
         fig = plot_kwant_system(qpc)
         out_fig = fig_to_uri(fig)
@@ -369,7 +369,7 @@ def update_kwant_system(
 @app.callback(
     Output("kwant-band-structure", component_property='src'),
     Input("update-kwant-system", "n_clicks"),
-    State("numpts-kwant-system", "value"),
+    State("lattice-constant-kwant-system", "value"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
     State("lead2-x", "value"),
@@ -386,7 +386,7 @@ def update_kwant_system(
     Input({"type": "potential-slider", "index": ALL}, "value"),
 )
 def update_kwant_band_structure(
-    update_kwant_band_structure, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+    update_kwant_band_structure, lattice_constant, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
@@ -411,7 +411,7 @@ def update_kwant_band_structure(
         lead2_coords = np.array([lead2x, lead2y])
         lead_coords = [lead1_coords, lead2_coords]
 
-        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy,  0, a=lattice_constant)
 
         fig = plot_kwant_band_structure(qpc)
         out_fig = fig_to_uri(fig)
@@ -429,7 +429,7 @@ def update_kwant_band_structure(
     Output("kwant-simulation", "figure"),
     Input("run-kwant-system-1d", "n_clicks"),
     Input("run-kwant-system-2d", "n_clicks"),
-    State("numpts-kwant-system", "value"),
+    State("lattice-constant-kwant-system", "value"),
     State("lead1-x", "value"),
     State("lead1-y", "value"),
     State("lead2-x", "value"),
@@ -454,7 +454,7 @@ def update_kwant_band_structure(
     # app_inputs,
 )
 def update_kwant_system(
-    update_kwant_system1d, update_kwant_system2d, numpts_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+    update_kwant_system1d, lattice_constant, numpts_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
@@ -491,14 +491,14 @@ def update_kwant_system(
             discretised_gates[gate1_name]["gate_val"] = voltage_1
 
             if "run-kwant-system-1d" == ctx.triggered_id:
-                qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+                qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy,  0, a=lattice_constant)
                 transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
                 transmission_array[0, v1_index] = transmission  
 
             elif "run-kwant-system-2d" == ctx.triggered_id:
                 for v2_index, voltage_2 in enumerate(voltage2_array):
                     discretised_gates[gate2_name]["gate_val"] = voltage_2
-                    qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+                    qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy,  0, a=lattice_constant)
 
                     transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
                     transmission_array[v2_index, v1_index] = transmission  
