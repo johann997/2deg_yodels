@@ -53,8 +53,8 @@ app_layout, app_inputs = create_app_layout(default_fig(), UPLOAD_DIRECTORY)
 
 app = Dash(__name__)
 
-app.layout = html.Div(app_layout)
-
+app.title = '2deg Yodels'
+app.layout = html.Div(app_layout,)
 
 #######################################################
 ##### save .dxf to UPLOAD_DIRECTORY and plot data #####
