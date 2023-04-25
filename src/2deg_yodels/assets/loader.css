@@ -9,15 +9,15 @@
     padding-top: 50px;
     color: #000;
 
-    -webkit-animation: fadein 0.5s ease-in 1s forwards;
+    -webkit-animation: fadein 0.5s ease-in 1.0s forwards;
     /* Safari, Chrome and Opera > 12.1 */
-    -moz-animation: fadein 0.5s ease-in 1s forwards;
+    -moz-animation: fadein 0.5s ease-in 1.0s forwards;
     /* Firefox < 16 */
-    -ms-animation: fadein 0.5s ease-in 1s forwards;
+    -ms-animation: fadein 0.5s ease-in 1.0s forwards;
     /* Internet Explorer */
-    -o-animation: fadein 0.5s ease-in 1s forwards;
+    -o-animation: fadein 0.5s ease-in 1.0s forwards;
     /* Opera < 12.1 */
-    animation: fadein 0.5s ease-in 1s forwards;
+    animation: fadein 0.5s ease-in 1.0s forwards;
     /* prevent flickering on every callback */
     -webkit-animation-delay: 0.5s;
     animation-delay: 0.5s;
