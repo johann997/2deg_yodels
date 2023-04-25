@@ -19,7 +19,8 @@ import matplotlib.pyplot as plt
 # pio.renderers.default = "notebook_connected"
 
 # charge of electron
-electron_charge = 1.602e-19
+# electron_charge = 1.602e-19
+electron_charge = 1
 
 ############################################################
 #####              PLOTLY DEFAULT LAYOUTS              #####

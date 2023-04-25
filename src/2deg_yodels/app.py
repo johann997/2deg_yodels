@@ -289,7 +289,7 @@ def update_potential(
                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
-        # color_range = [np.min(z_data), np.max(z_data)]
+        color_range = [np.min(z_data), np.max(z_data)]
         plot_info = get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny)
         potential_fig = plot_discretised_gates(
             discretised_gates,
@@ -297,7 +297,7 @@ def update_potential(
             plot_type="potential",
             plot=False,
             colorscale="Plotly3",
-            # color_range=color_range,
+            color_range=color_range,
         )
 
         return potential_fig
@@ -305,211 +305,235 @@ def update_potential(
         return default_fig()
 
 
-# #################################
-# ##### creating kwant system #####
-# #################################
-# @app.callback(
-#     Output("kwant-system", component_property='src'),
-#     Input("update-kwant-system", "n_clicks"),
-#     State("numpts-kwant-system", "value"),
-#     State("lead1-x", "value"),
-#     State("lead1-y", "value"),
-#     State("lead2-x", "value"),
-#     State("lead2-y", "value"),
-#     State("2deg-depth", "value"),
-#     State("min-x-potential", "value"),
-#     State("max-x-potential", "value"),
-#     State("min-y-potential", "value"),
-#     State("max-y-potential", "value"),
-#     State("numpts-x-potential", "value"),
-#     State("numpts-y-potential", "value"),
-#     State("upload-data", "filename"),
-#     app_inputs,
-# )
-# def update_kwant_system(
-#     update_kwant_system, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
-# ):
-#     if filename is not None:
-#         discretised_gates = get_discretised_gates_from_csv(
-#             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
-#         )
-#         z_data = 0
-#         index = -1
-#         for key, val in discretised_gates.items():
-#             if "val_" in key:
-#                 index += 1
-#                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
-#                 z_data = z_data + discretised_gates[key]["potential"]
+#################################
+##### creating kwant system #####
+#################################
+@app.callback(
+    Output("kwant-system", component_property='src'),
+    Input("update-kwant-system", "n_clicks"),
+    State("numpts-kwant-system", "value"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("2deg-depth", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    Input({"type": "potential-slider", "index": ALL}, "value"),
+    # app_inputs,
+)
+def update_kwant_system(
+    update_kwant_system, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+        # z_data = 0
+        # index = -1
+        # for key, val in discretised_gates.items():
+        #     if "val_" in key:
+        #         index += 1
+        #         discretised_gates[key]["gate_val"] = slider_vals[index][0]
+        #         z_data = z_data + discretised_gates[key]["potential"]
+        z_data = 0
+        # index = -1
+        for index, (key, val) in enumerate(discretised_gates.items()):
+            if "val_" in key:
+                # index += 1
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
 
-#         lead1_coords = np.array([lead1x, lead1y])
-#         lead2_coords = np.array([lead2x, lead2y])
-#         lead_coords = [lead1_coords, lead2_coords]
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
 
-#         qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
 
-#         fig = plot_kwant_system(qpc)
-#         out_fig = fig_to_uri(fig)
+        fig = plot_kwant_system(qpc)
+        out_fig = fig_to_uri(fig)
 
-#         return out_fig
-#     else:
-#         return ""
+        return out_fig
+    else:
+        return ""
     
 
-# #################################
-# ##### plotting kwant bands  #####
-# #################################
-# @app.callback(
-#     Output("kwant-band-structure", component_property='src'),
-#     Input("update-kwant-system", "n_clicks"),
-#     State("numpts-kwant-system", "value"),
-#     State("lead1-x", "value"),
-#     State("lead1-y", "value"),
-#     State("lead2-x", "value"),
-#     State("lead2-y", "value"),
-#     State("2deg-depth", "value"),
-#     State("min-x-potential", "value"),
-#     State("max-x-potential", "value"),
-#     State("min-y-potential", "value"),
-#     State("max-y-potential", "value"),
-#     State("numpts-x-potential", "value"),
-#     State("numpts-y-potential", "value"),
-#     State("upload-data", "filename"),
-#     app_inputs,
-# )
-# def update_kwant_band_structure(
-#     update_kwant_band_structure, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
-# ):
-#     if filename is not None:
-#         discretised_gates = get_discretised_gates_from_csv(
-#             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
-#         )
-#         z_data = 0
-#         index = -1
-#         for key, val in discretised_gates.items():
-#             if "val_" in key:
-#                 index += 1
-#                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
-#                 z_data = z_data + discretised_gates[key]["potential"]
+#################################
+##### plotting kwant bands  #####
+#################################
+@app.callback(
+    Output("kwant-band-structure", component_property='src'),
+    Input("update-kwant-system", "n_clicks"),
+    State("numpts-kwant-system", "value"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("2deg-depth", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    # app_inputs,
+    Input({"type": "potential-slider", "index": ALL}, "value"),
+)
+def update_kwant_band_structure(
+    update_kwant_band_structure, numpts_system, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+        # z_data = 0
+        # index = -1
+        # for key, val in discretised_gates.items():
+        #     if "val_" in key:
+        #         index += 1
+        #         discretised_gates[key]["gate_val"] = slider_vals[index][0]
+        #         z_data = z_data + discretised_gates[key]["potential"]
+        z_data = 0
+        # index = -1
+        for index, (key, val) in enumerate(discretised_gates.items()):
+            if "val_" in key:
+                # index += 1
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
 
-#         lead1_coords = np.array([lead1x, lead1y])
-#         lead2_coords = np.array([lead2x, lead2y])
-#         lead_coords = [lead1_coords, lead2_coords]
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
 
-#         qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
 
-#         fig = plot_kwant_band_structure(qpc)
-#         out_fig = fig_to_uri(fig)
+        fig = plot_kwant_band_structure(qpc)
+        out_fig = fig_to_uri(fig)
 
-#         return out_fig
-#     else:
-#         return ""
+        return out_fig
+    else:
+        return ""
     
 
 
-# #################################
-# ##### running kwant system  #####
-# #################################
-# @app.callback(
-#     Output("kwant-simulation", "figure"),
-#     Input("run-kwant-system-1d", "n_clicks"),
-#     Input("run-kwant-system-2d", "n_clicks"),
-#     State("numpts-kwant-system", "value"),
-#     State("lead1-x", "value"),
-#     State("lead1-y", "value"),
-#     State("lead2-x", "value"),
-#     State("lead2-y", "value"),
-#     State("gate1-id", "value"),
-#     State("gate1-min", "value"),
-#     State("gate1-max", "value"),
-#     State("gate2-id", "value"),
-#     State("gate2-min", "value"),
-#     State("gate2-max", "value"),
-#     State("2deg-depth", "value"),
-#     State("numpts-kwant-simulation", "value"),
-#     State("energy-kwant-simulation", "value"),
-#     State("min-x-potential", "value"),
-#     State("max-x-potential", "value"),
-#     State("min-y-potential", "value"),
-#     State("max-y-potential", "value"),
-#     State("numpts-x-potential", "value"),
-#     State("numpts-y-potential", "value"),
-#     State("upload-data", "filename"),
-#     app_inputs,
-# )
-# def update_kwant_system(
-#     update_kwant_system1d, update_kwant_system2d, numpts_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
-# ):
-#     if filename is not None:
-#         discretised_gates = get_discretised_gates_from_csv(
-#             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
-#         )
-#         z_data = 0
-#         index = -1
-#         for key, val in discretised_gates.items():
-#             if "val_" in key:
-#                 index += 1
-#                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
-#                 z_data = z_data + discretised_gates[key]["potential"]
+#################################
+##### running kwant system  #####
+#################################
+@app.callback(
+    Output("kwant-simulation", "figure"),
+    Input("run-kwant-system-1d", "n_clicks"),
+    Input("run-kwant-system-2d", "n_clicks"),
+    State("numpts-kwant-system", "value"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("gate1-id", "value"),
+    State("gate1-min", "value"),
+    State("gate1-max", "value"),
+    State("gate2-id", "value"),
+    State("gate2-min", "value"),
+    State("gate2-max", "value"),
+    State("2deg-depth", "value"),
+    State("numpts-kwant-simulation", "value"),
+    State("energy-kwant-simulation", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    Input({"type": "potential-slider", "index": ALL}, "value"),
+    # app_inputs,
+)
+def update_kwant_system(
+    update_kwant_system1d, update_kwant_system2d, numpts_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+        # z_data = 0
+        # index = -1
+        # for key, val in discretised_gates.items():
+        #     if "val_" in key:
+        #         index += 1
+        #         discretised_gates[key]["gate_val"] = slider_vals[index][0]
+        #         z_data = z_data + discretised_gates[key]["potential"]
+        z_data = 0
+        # index = -1
+        for index, (key, val) in enumerate(discretised_gates.items()):
+            if "val_" in key:
+                # index += 1
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
 
-#         lead1_coords = np.array([lead1x, lead1y])
-#         lead2_coords = np.array([lead2x, lead2y])
-#         lead_coords = [lead1_coords, lead2_coords]
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
 
-#         # looping for multiple gate vals
-#         gate1_name = f"val_{int(gate1id)}"
-#         gate2_name = f"val_{int(gate2id)}"
+        # looping for multiple gate vals
+        gate1_name = f"val_{int(gate1id)}"
+        gate2_name = f"val_{int(gate2id)}"
 
-#         transmission_array = np.zeros((numpts_simulation, numpts_simulation))
-#         voltage1_array = np.linspace(gate1min, gate1max, numpts_simulation)
-#         voltage2_array = np.linspace(gate2min, gate2max, numpts_simulation)
+        transmission_array = np.zeros((numpts_simulation, numpts_simulation))
+        voltage1_array = np.linspace(gate1min, gate1max, numpts_simulation)
+        voltage2_array = np.linspace(gate2min, gate2max, numpts_simulation)
 
-#         for v1_index, voltage_1 in enumerate(voltage1_array):
-#             discretised_gates[gate1_name]["gate_val"] = voltage_1
+        for v1_index, voltage_1 in enumerate(voltage1_array):
+            discretised_gates[gate1_name]["gate_val"] = voltage_1
 
-#             if "run-kwant-system-1d" == ctx.triggered_id:
-#                 qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
-#                 transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
-#                 transmission_array[0, v1_index] = transmission  
+            if "run-kwant-system-1d" == ctx.triggered_id:
+                qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+                transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
+                transmission_array[0, v1_index] = transmission  
 
-#             elif "run-kwant-system-2d" == ctx.triggered_id:
-#                 for v2_index, voltage_2 in enumerate(voltage2_array):
-#                     discretised_gates[gate2_name]["gate_val"] = voltage_2
-#                     qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
+            elif "run-kwant-system-2d" == ctx.triggered_id:
+                for v2_index, voltage_2 in enumerate(voltage2_array):
+                    discretised_gates[gate2_name]["gate_val"] = voltage_2
+                    qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts_system)
 
-#                     transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
-#                     transmission_array[v2_index, v1_index] = transmission  
+                    transmission = get_kwant_transmission(qpc, energy=energy_simulation, lead_out=1, lead_in=0)
+                    transmission_array[v2_index, v1_index] = transmission  
                 
 
-#         # setting up figure for plotting
-#         fig = default_fig()
+        # setting up figure for plotting
+        fig = default_fig()
 
-#         if "run-kwant-system-1d" == ctx.triggered_id:
-#             fig.add_trace(
-#                 go.Scatter(
-#                     x=voltage1_array,
-#                     y=transmission_array[0],
-#                 )
-#             )
-#             fig.update_layout(xaxis_title='Gate Voltage (V)',
-#                               yaxis_title='Conductance (e^2/h)')
+        if "run-kwant-system-1d" == ctx.triggered_id:
+            fig.add_trace(
+                go.Scatter(
+                    x=voltage1_array,
+                    y=transmission_array[0],
+                )
+            )
+            fig.update_layout(xaxis_title='Gate Voltage (V)',
+                              yaxis_title='Conductance (e^2/h)')
 
-#         elif "run-kwant-system-2d" == ctx.triggered_id:
-#             fig.add_trace(
-#                 go.Heatmap(
-#                     z=transmission_array,
-#                     x=voltage1_array,
-#                     y=voltage2_array,
-#                     opacity=1,
-#                 )
-#             )
-#             fig.update_layout(xaxis_title='Gate 1 Voltage (V)',
-#                               yaxis_title='Gate 2 Voltage (V)',)
+        elif "run-kwant-system-2d" == ctx.triggered_id:
+            fig.add_trace(
+                go.Heatmap(
+                    z=transmission_array,
+                    x=voltage1_array,
+                    y=voltage2_array,
+                    opacity=1,
+                )
+            )
+            fig.update_layout(xaxis_title='Gate 1 Voltage (V)',
+                              yaxis_title='Gate 2 Voltage (V)',)
 
         
 
-#         return fig
-#     else:
-#         return default_fig()
+        return fig
+    else:
+        return default_fig()
     
 
 # run the app
