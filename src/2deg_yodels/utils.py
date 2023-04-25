@@ -213,8 +213,9 @@ def get_discretised_gates(plot_info, polyline_gates):
         (xx_axis.reshape(-1, 1), yy_axis.reshape(-1, 1))
     )  # coors.shape is (4000000,2)
 
-    gate_num = 0
+    # gate_num = 0
     for key, val in polyline_gates.items():
+        gate_num = key.split('_')[-1]
         x_data = val["x_array"]
         y_data = val["y_array"]
 
@@ -231,7 +232,7 @@ def get_discretised_gates(plot_info, polyline_gates):
                 "gate_val": 1,
             }
             discretised_gates[f"val_{gate_num}"] = gate_dict
-            gate_num += 1
+            # gate_num += 1
             z_data = z_data + mask_2d.astype(int)
 
     discretised_gates["x_axis"] = x_axis
@@ -333,9 +334,10 @@ def save_geometric_potential_to_csv(
     """
     csv_df = pd.DataFrame([])
 
-    gate_num = 0
+    # gate_num = 0
     for key, val in discretised_gates.items():
         if "val_" in key:
+            gate_num = key.split('_')[-1]
             temp_df = pd.DataFrame(
                 {
                     f"val_{gate_num}_coordinates": discretised_gates[key][
@@ -347,7 +349,7 @@ def save_geometric_potential_to_csv(
                 }
             )
             csv_df = pd.concat([csv_df, temp_df], axis=1)
-            gate_num += 1
+            # gate_num += 1
         else:
             temp_df = pd.DataFrame({key: discretised_gates[key].flatten()})
             csv_df = pd.concat([csv_df, temp_df], axis=1)
@@ -396,7 +398,7 @@ def get_discretised_gates_from_csv(
         val = "".join(column_name.split("_")[0:2])
 
         if "val" in val:
-            gate[column_name.split("_")[-1]] = get_1d_to_2d(df[column_name], nx, ny)
+            gate[column_name.split("_")[-1]] = get_1d_to_2d(df[column_name], int(nx), int(ny))
             try:
                 if "".join(column_names[index + 1].split("_")[0:2]) != val:
                     discretised_gates["_".join(column_name.split("_")[0:2])] = gate
@@ -496,7 +498,7 @@ def read_csv_to_polyline(name, upload_directory):
     polyline_gates = {}
 
     for index in range(int(len(column_names) / 2 - 1)):
-        val = "".join(column_names[int(2 * index)].split("_")[0:2])
+        val = "_".join(column_names[int(2 * index)].split("_")[0:2])
 
         x_array = df[column_names[int(2 * index)]].dropna().to_numpy()
         y_array = df[column_names[int(2 * index + 1)]].dropna().to_numpy()

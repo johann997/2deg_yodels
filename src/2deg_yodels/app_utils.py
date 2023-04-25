@@ -147,10 +147,19 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
     potential_layout = [
         html.Div(
             [
-                html.H4("Potential chane in 2DEG"),
+                html.H4("Potential change in 2DEG"),
                 dcc.Graph(id="potential-graph"),
             ],
             style={"width": "59%", "height": "59%", "display": "inline-block"},
+        )
+    ]
+
+    potential_slider_layout = [
+        html.Div(
+            [
+                html.Div(id="potential-slider-container-div", children=[]),
+                html.Div(id="potential-slider-container-output-div"),
+            ]
         )
     ]
 
@@ -262,7 +271,10 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
         )
     ]
 
-    potential_layout, app_inputs = create_n_sliders(num_sliders, potential_layout)
-    app_layout = setup_layout + potential_layout + kwant_layout
+    # create_n_sliders_layout, app_inputs = create_n_sliders(num_sliders, potential_layout)
+    app_inputs = 0
+
+
+    app_layout = setup_layout + potential_layout + potential_slider_layout + kwant_layout
 
     return app_layout, app_inputs
