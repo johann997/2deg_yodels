@@ -38,6 +38,7 @@ from kwant_utils import (
     plot_kwant_info,
     get_kwant_transmission,
     plot_kwant_band_structure,
+    plot_kwant_density
 )
 
 cwd = os.getcwd()
@@ -195,19 +196,18 @@ def display_output(values):
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
     Input({"type": "potential-slider", "index": ALL}, "value"),
+    Input('plot-potential-3d-switch', 'on'),
 )
 def update_potential(
-    depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+    depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals, plot_potential_3d
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
         )
         z_data = 0
-        # index = -1
         for index, (key, val) in enumerate(discretised_gates.items()):
             if "val_" in key:
-                # index += 1
                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
@@ -220,6 +220,7 @@ def update_potential(
             plot=False,
             colorscale="Plotly3",
             color_range=color_range,
+            plot_3d=plot_potential_3d
         )
 
         return potential_fig
@@ -247,7 +248,6 @@ def update_potential(
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
     State({"type": "potential-slider", "index": ALL}, "value"),
-    # app_inputs,
 )
 def update_kwant_system(
     update_kwant_system, lattice_constant, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
@@ -299,7 +299,6 @@ def update_kwant_system(
     State("numpts-x-potential", "value"),
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
-    # app_inputs,
     State({"type": "potential-slider", "index": ALL}, "value"),
 )
 def update_kwant_band_structure(
@@ -326,6 +325,62 @@ def update_kwant_band_structure(
         ax = fig.add_subplot(111)
 
         fig = plot_kwant_band_structure(qpc, ax=ax)
+        fig = ax.get_figure()
+        out_fig = fig_to_uri(fig)
+
+        return out_fig
+    else:
+        return ""
+    
+
+
+########################################
+##### plotting kwant wavefunction  #####
+########################################
+@app.callback(
+    Output("kwant-wave-function", component_property='src'),
+    Input("run-kwant-system-wf", "n_clicks"),
+    State("lattice-constant-kwant-system", "value"),
+    State("lead1-x", "value"),
+    State("lead1-y", "value"),
+    State("lead2-x", "value"),
+    State("lead2-y", "value"),
+    State("2deg-depth", "value"),
+    State("min-x-potential", "value"),
+    State("max-x-potential", "value"),
+    State("min-y-potential", "value"),
+    State("max-y-potential", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    State({"type": "potential-slider", "index": ALL}, "value"),
+    State("energy-kwant-simulation", "value"),
+)
+def update_kwant_wavefunction(
+    update_kwant_band_structure, lattice_constant, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals, energy_simulation
+):
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+
+        z_data = 0
+        for index, (key, val) in enumerate(discretised_gates.items()):
+            if "val_" in key:
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                z_data = z_data + discretised_gates[key]["potential"]
+
+        lead1_coords = np.array([lead1x, lead1y])
+        lead2_coords = np.array([lead2x, lead2y])
+        lead_coords = [lead1_coords, lead2_coords]
+
+        qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy,  0, a=lattice_constant)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        fig = plot_kwant_band_structure(qpc, ax=ax)
+        fig = plot_kwant_density(qpc, energy_simulation, lead_num=0, ax=ax)
         fig = ax.get_figure()
         out_fig = fig_to_uri(fig)
 

@@ -142,27 +142,28 @@ def plot_discretised_gates(
         )
         fig.add_trace(surface_trace)
 
-        # heatmap to see gate outline
-        gate_index = np.where(gate_data == 1)
-        nogate_index = np.where(gate_data != 1)
-        gate_data[gate_index] = (
-            gate_data[gate_index] / np.max(gate_data) * np.max(z_data)
-        ) + np.max(z_data) * 0.1
-        gate_data[nogate_index] = np.max(z_data) * 0.0999
+        # functionality of heatmap not great right now
+        # # heatmap to see gate outline
+        # gate_index = np.where(gate_data == 1)
+        # nogate_index = np.where(gate_data != 1)
+        # gate_data[gate_index] = (
+        #     gate_data[gate_index] / np.max(gate_data) * np.max(z_data)
+        # ) + np.max(z_data) * 0.1
+        # gate_data[nogate_index] = np.max(z_data) * 0.0999
 
-        fig.add_trace(
-            go.Surface(
-                z=gate_data,
-                x=x_axis,
-                y=y_axis,
-                colorscale="greys",
-                showscale=False,
-                reversescale=True,
-                opacity=0.5,
-                cmin=np.max(z_data) * 0.0999,
-                cmax=np.max(z_data) * 0.1,
-            )
-        )
+        # fig.add_trace(
+        #     go.Surface(
+        #         z=gate_data,
+        #         x=x_axis,
+        #         y=y_axis,
+        #         colorscale="greys",
+        #         showscale=False,
+        #         reversescale=True,
+        #         opacity=0.5,
+        #         cmin=np.max(z_data) * 0.0999,
+        #         cmax=np.max(z_data) * 0.1,
+        #     )
+        # )
 
     fig.update_layout(
         #         title=f'Plotting {dxf_file}',

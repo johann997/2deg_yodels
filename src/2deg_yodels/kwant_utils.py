@@ -310,8 +310,19 @@ def plot_kwant_band_structure(qpc, lead_num=0, ax=None):
 
     
 
+def plot_kwant_density(qpc, energy, lead_num=0, ax=None):
 
-def plot_kwant_info(qpc, info_type='bands', lead_num=0):
+    fqpc = _finalise_kwant_system(qpc)
+    def density():
+        wf = kw.wave_function(fqpc, energy) 
+        return (abs(wf(lead_num))**2).sum(axis=0)
+    
+    d = density() 
+    
+    return kw.plotter.map(fqpc, d, show=False,  ax=ax)
+
+
+def plot_kwant_info(qpc, energy, info_type='bands', lead_num=0, ax=None):
 
     fqpc = _finalise_kwant_system(qpc)
 

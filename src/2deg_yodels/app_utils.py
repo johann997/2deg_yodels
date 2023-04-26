@@ -2,6 +2,7 @@ import numpy as np
 from dash import Dash
 from dash import dcc
 from dash import html
+import dash_daq as daq
 from dash.dependencies import Input, Output, State
 
 
@@ -137,6 +138,8 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     id="discretised-gate-graph", figure=initial_fig, style=fig_style
                 ),
                 html.Button("Update Potential", id="update-potential"),
+                daq.BooleanSwitch(id='plot-potential-3d-switch', on=False, 
+                                  label="Plot 3d", labelPosition="top", color="#9B51E0",),
             ]
         ),
         html.Div(id="dummy1"),
@@ -203,25 +206,30 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     value=1.25,
                 ),
                 html.Button("Plot System", id="update-kwant-system"),
-                # html.Img(id = 'kwant-system"', src = ''),
                 html.Div([html.Img(id = 'kwant-system', src = '')],
                             id='kwant-system-plot-div'),
                 html.Div([html.Img(id = 'kwant-band-structure', src = '')],
                             id='kwant-band-structure-plot-div'),
-                html.H4("Run charge stability diagram"),
-                html.H4("Min number of points in simulation"),
-                dcc.Input(
-                    id="numpts-kwant-simulation",
-                    type="number",
-                    placeholder="min numpts",
-                    value=25,
-                ),
+                html.H3("Plotting wave function and current"),
                 html.H4("Excitation energy at which to solve the scattering problem."),
                 dcc.Input(
                     id="energy-kwant-simulation",
                     type="number",
                     placeholder="min numpts",
                     value=0.1,
+                ),
+                html.Button("Run wavefunction & Current", id="run-kwant-system-wf", n_clicks=0),
+                html.Div([html.Img(id = 'kwant-wave-function', src = '')],
+                            id='kwant-wave-function-plot-div'),
+                html.Div([html.Img(id = 'kwant-current', src = '')],
+                            id='kwant-current-plot-div'),
+                html.H3("Run charge stability diagram"),
+                html.H4("Min number of points in simulation"),
+                dcc.Input(
+                    id="numpts-kwant-simulation",
+                    type="number",
+                    placeholder="min numpts",
+                    value=25,
                 ),
                 html.H5("Gate 1 [id, min, max]"),
                 dcc.Input(
