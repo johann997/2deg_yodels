@@ -277,10 +277,10 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
     return qpc
 
 
-def plot_kwant_system(qpc):
+def plot_kwant_system(qpc, ax=None):
     
     ###### A plot of the system #####
-    return kw.plotter.plot(qpc, show=False)
+    return kw.plotter.plot(qpc, show=False, ax=ax)
 
 
 def plot_kwant_potential(discretised_gates, qpc):
@@ -304,9 +304,9 @@ def _finalise_kwant_system(qpc):
     return qpc.finalized()
 
 
-def plot_kwant_band_structure(qpc, lead_num=0):
+def plot_kwant_band_structure(qpc, lead_num=0, ax=None):
 
-    fqpc = _finalise_kwant_system(qpc)
+    fqpc = _finalise_kwant_system(qpc, ax=ax)
 
     return kw.plotter.bands(fqpc.leads[lead_num], show=False)
 

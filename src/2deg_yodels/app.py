@@ -9,6 +9,7 @@ from dash import ALL
 from dash.dependencies import Input, Output, State
 
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 from app_utils import create_app_layout, create_n_sliders
 
@@ -355,7 +356,11 @@ def update_kwant_system(
 
         qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, 0, a=lattice_constant)
 
-        fig = plot_kwant_system(qpc)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        fig = plot_kwant_system(qpc, ax=ax)
+        fig = ax.get_figure()
         out_fig = fig_to_uri(fig)
 
         return out_fig
@@ -413,7 +418,11 @@ def update_kwant_band_structure(
 
         qpc = make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy,  0, a=lattice_constant)
 
-        fig = plot_kwant_band_structure(qpc)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        fig = plot_kwant_band_structure(qpc, ax=ax)
+        fig = ax.get_figure()
         out_fig = fig_to_uri(fig)
 
         return out_fig
