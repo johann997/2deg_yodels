@@ -9,7 +9,9 @@ from dash import ALL
 from dash.dependencies import Input, Output, State
 
 import plotly.graph_objects as go
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('agg')
 
 from app_utils import create_app_layout, create_n_sliders
 
@@ -358,7 +360,6 @@ def update_kwant_system(
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-
         fig = plot_kwant_system(qpc, ax=ax)
         fig = ax.get_figure()
         out_fig = fig_to_uri(fig)

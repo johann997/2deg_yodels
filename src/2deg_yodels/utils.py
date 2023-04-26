@@ -315,6 +315,7 @@ def fig_to_uri(in_fig, close_all=True, **save_args):
         plt.close('all')
     out_img.seek(0)  # rewind file
     encoded = base64.b64encode(out_img.read()).decode("ascii").replace("\n", "")
+    out_img.close()
     return "data:image/png;base64,{}".format(encoded)
 
 

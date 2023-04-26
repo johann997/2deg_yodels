@@ -306,9 +306,9 @@ def _finalise_kwant_system(qpc):
 
 def plot_kwant_band_structure(qpc, lead_num=0, ax=None):
 
-    fqpc = _finalise_kwant_system(qpc, ax=ax)
+    fqpc = _finalise_kwant_system(qpc)
 
-    return kw.plotter.bands(fqpc.leads[lead_num], show=False)
+    return kw.plotter.bands(fqpc.leads[lead_num], show=False,  ax=ax)
 
     
 
