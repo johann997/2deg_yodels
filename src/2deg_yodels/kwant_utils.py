@@ -248,6 +248,8 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
     # lattice constant of the tight-binding system (nm)
     if a == 0:
         a = int(get_lattice_constant(minx, maxx, miny, maxy, numpts=numpts) * um_to_nm)
+    else:
+        a = int(a)
 
     if T == 1:
         t  = (hbar**2 / (2 * effective_mass * (a*nm)**2)) * j_to_ev  # in units of Energy

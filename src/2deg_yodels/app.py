@@ -463,8 +463,8 @@ def update_kwant_band_structure(
     State({"type": "potential-slider", "index": ALL}, "value"),
     # app_inputs,
 )
-def update_kwant_system(
-    update_kwant_system1d, lattice_constant, numpts_system, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
+def running_kwant_system(
+    update_kwant_system1d, update_kwant_system2d, lattice_constant, lead1x, lead1y, lead2x, lead2y, gate1id, gate1min, gate1max, gate2id, gate2min, gate2max,  depth_2deg, numpts_simulation, energy_simulation, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
