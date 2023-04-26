@@ -15,14 +15,10 @@ electron_charge = 1.602e-19  # electron charge (C)
 hbar = 1.05e-34 # hbar
 nm = 1e-9  # nanometres
 um_to_nm = 1e-6 / nm  # convert micrometres to nanometres
-# hbar /= nm**2 # convert hbar to nm
 j_to_ev = 6.24e18 # convert J to eV
 effective_mass = 0.067 * 9.109e-31  # an effective mass of electrons in 2DEG
-# T = 1
 T = (hbar**2 / (2 * effective_mass * (nm)**2)) * j_to_ev
-# T = (
-#     hb * hb / 2 / nm / nm / ms / e
-# )  # constant to convert from eV (output of nn++) to kwant energy unit
+
 
 
 def get_lattice_constant(minx, maxx, miny, maxy, numpts=100):

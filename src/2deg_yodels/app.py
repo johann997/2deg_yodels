@@ -111,88 +111,7 @@ def update_discretised_gates(
         return default_fig()
 
 
-# ###################################
-# #####   calculate potential   #####
-# ###################################
-# @app.callback(
-#     Output("dummy2", "children"),
-#     Input("update-potential", "n_clicks"),
-#     State("2deg-depth", "value"),
-#     State("min-x-potential", "value"),
-#     State("max-x-potential", "value"),
-#     State("min-y-potential", "value"),
-#     State("max-y-potential", "value"),
-#     State("numpts-x-potential", "value"),
-#     State("numpts-y-potential", "value"),
-#     State("upload-data", "filename"),
-# )
-# def update_potential_csv(
-#     update_potential_csv, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename
-# ):
-#     if filename is not None:
-#         polyline_gates = read_csv_to_polyline(filename, UPLOAD_DIRECTORY)
 
-#         plot_info = get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny)
-#         discretised_gates = get_discretised_gates(plot_info, polyline_gates)
-#         material_info = {"2deg_depth": depth_2deg}
-#         discretised_gates_new = get_potential_from_gate(
-#             discretised_gates, material_info
-#         )
-#         save_geometric_potential_to_csv(
-#             discretised_gates_new,
-#             csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv",
-#         )
-#         return None
-
-
-# ##############################
-# ##### updating potential #####
-# ##############################
-# @app.callback(
-#     Output("potential-graph", "figure"),
-#     State("2deg-depth", "value"),
-#     State("min-x-potential", "value"),
-#     State("max-x-potential", "value"),
-#     State("min-y-potential", "value"),
-#     State("max-y-potential", "value"),
-#     State("numpts-x-potential", "value"),
-#     State("numpts-y-potential", "value"),
-#     State("upload-data", "filename"),
-#     app_inputs,
-# )
-# def update_potential(
-#     depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, *slider_vals
-# ):
-#     if filename is not None:
-#         discretised_gates = get_discretised_gates_from_csv(
-#             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
-#         )
-#         z_data = 0
-#         index = -1
-#         for key, val in discretised_gates.items():
-#             if "val_" in key:
-#                 index += 1
-#                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
-#                 z_data = z_data + discretised_gates[key]["potential"]
-
-#         # color_range = [np.min(z_data), np.max(z_data)]
-#         plot_info = get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny)
-#         potential_fig = plot_discretised_gates(
-#             discretised_gates,
-#             plot_info,
-#             plot_type="potential",
-#             plot=False,
-#             colorscale="Plotly3",
-#             # color_range=color_range,
-#         )
-
-#         return potential_fig
-#     else:
-#         return default_fig()
-
-#################################
-############ TESTING ############
-#################################
 ###################################
 #####   calculate potential   #####
 ###################################
@@ -337,18 +256,10 @@ def update_kwant_system(
         discretised_gates = get_discretised_gates_from_csv(
             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
         )
-        # z_data = 0
-        # index = -1
-        # for key, val in discretised_gates.items():
-        #     if "val_" in key:
-        #         index += 1
-        #         discretised_gates[key]["gate_val"] = slider_vals[index][0]
-        #         z_data = z_data + discretised_gates[key]["potential"]
+
         z_data = 0
-        # index = -1
         for index, (key, val) in enumerate(discretised_gates.items()):
             if "val_" in key:
-                # index += 1
                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
@@ -398,18 +309,10 @@ def update_kwant_band_structure(
         discretised_gates = get_discretised_gates_from_csv(
             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
         )
-        # z_data = 0
-        # index = -1
-        # for key, val in discretised_gates.items():
-        #     if "val_" in key:
-        #         index += 1
-        #         discretised_gates[key]["gate_val"] = slider_vals[index][0]
-        #         z_data = z_data + discretised_gates[key]["potential"]
+
         z_data = 0
-        # index = -1
         for index, (key, val) in enumerate(discretised_gates.items()):
             if "val_" in key:
-                # index += 1
                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
@@ -470,18 +373,10 @@ def running_kwant_system(
         discretised_gates = get_discretised_gates_from_csv(
             nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
         )
-        # z_data = 0
-        # index = -1
-        # for key, val in discretised_gates.items():
-        #     if "val_" in key:
-        #         index += 1
-        #         discretised_gates[key]["gate_val"] = slider_vals[index][0]
-        #         z_data = z_data + discretised_gates[key]["potential"]
+
         z_data = 0
-        # index = -1
         for index, (key, val) in enumerate(discretised_gates.items()):
             if "val_" in key:
-                # index += 1
                 discretised_gates[key]["gate_val"] = slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
