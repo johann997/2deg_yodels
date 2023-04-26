@@ -254,7 +254,7 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
     if T == 1:
         t  = (hbar**2 / (2 * effective_mass * (a*nm)**2)) * j_to_ev  # in units of Energy
     else:
-        t = 1
+        t = 1/a**2
 
 
     ##### Creating a square lattice #####

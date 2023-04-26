@@ -56,7 +56,7 @@ app_layout, app_inputs = create_app_layout(default_fig(), UPLOAD_DIRECTORY)
 
 app = Dash(__name__)
 
-app.title = '2deg Yodels'
+app.title = '2DEG_YODELS'
 app.layout = html.Div(app_layout,)
 
 #######################################################
