@@ -324,7 +324,7 @@ def update_potential(
     State("numpts-x-potential", "value"),
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
-    Input({"type": "potential-slider", "index": ALL}, "value"),
+    State({"type": "potential-slider", "index": ALL}, "value"),
     # app_inputs,
 )
 def update_kwant_system(
@@ -383,7 +383,7 @@ def update_kwant_system(
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
     # app_inputs,
-    Input({"type": "potential-slider", "index": ALL}, "value"),
+    State({"type": "potential-slider", "index": ALL}, "value"),
 )
 def update_kwant_band_structure(
     update_kwant_band_structure, lattice_constant, lead1x, lead1y, lead2x, lead2y, depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals
@@ -450,7 +450,7 @@ def update_kwant_band_structure(
     State("numpts-x-potential", "value"),
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
-    Input({"type": "potential-slider", "index": ALL}, "value"),
+    State({"type": "potential-slider", "index": ALL}, "value"),
     # app_inputs,
 )
 def update_kwant_system(
