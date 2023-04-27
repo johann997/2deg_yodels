@@ -144,27 +144,50 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
         ),
         html.Div(id="dummy1"),
         html.Div(id="dummy2"),
+        html.H4("Potential change in 2DEG"),
     ]
 
+
+    # potential_layout = [
+    #     html.Div(
+    #         [
+    #             html.H4("Potential change in 2DEG"),
+    #             dcc.Graph(id="potential-graph"),
+    #             dcc.Store('potential-graph-camera'),
+    #         ],
+    #         style={"width": "90%", "height": "90%", "display": "inline-block"},
+    #     )
+    # ]
+
+    # potential_slider_layout = [
+    #     html.Div(
+    #         [
+    #             html.Div(id="potential-slider-container-div", children=[]),
+    #             html.Div(id="potential-slider-container-output-div"),
+    #         ]
+    #     )
+    # ]
 
     potential_layout = [
+        html.Div([
         html.Div(
             [
-                html.H4("Potential change in 2DEG"),
                 dcc.Graph(id="potential-graph"),
+                dcc.Store('potential-graph-camera'),
             ],
             style={"width": "59%", "height": "59%", "display": "inline-block"},
-        )
-    ]
-
-    potential_slider_layout = [
+        ),
         html.Div(
             [
                 html.Div(id="potential-slider-container-div", children=[]),
                 html.Div(id="potential-slider-container-output-div"),
-            ]
+            ],
+            style = {'width': '100%', 'display': 'inline-block'}
         )
+    ], style={"display": "flex"})
     ]
+
+
 
 
     kwant_layout = [
@@ -283,6 +306,6 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
     app_inputs = 0
 
 
-    app_layout = setup_layout + potential_layout + potential_slider_layout + kwant_layout
+    app_layout = setup_layout + potential_layout  + kwant_layout
 
     return app_layout, app_inputs

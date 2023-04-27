@@ -8,7 +8,10 @@ from dash import ctx
 from dash import ALL
 from dash.dependencies import Input, Output, State
 
+import  dash_bootstrap_components as dbc
+
 import plotly.graph_objects as go
+import plotly.io as pio
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('agg')
@@ -54,6 +57,8 @@ if not os.path.exists(PROCESSED_DIRECTORY):
     os.makedirs(PROCESSED_DIRECTORY)
 
 app_layout, app_inputs = create_app_layout(default_fig(), UPLOAD_DIRECTORY)
+
+# external_stylesheets=[dbc.themes.BOOTSTRAP]
 
 app = Dash(__name__)
 
@@ -154,11 +159,11 @@ def update_potential_csv(
                     dcc.RangeSlider(
                         id={"type": "potential-slider", "index": f"{key.split('_')[-1]}"},
                         # id=f"{key}-potential-slider",
-                        min=0,
-                        max=1,
+                        min=-1,
+                        max=0,
                         step=0.01,
-                        marks={i: "{}".format(i) for i in np.linspace(0, 1, 5)},
-                        value=[1.0],
+                        marks={i: "{}".format(i) for i in np.linspace(-1, 0, 5)},
+                        value=[-1.0],
                         tooltip={"placement": "bottom", "always_visible": True},
                     ),
                 ]
@@ -167,20 +172,46 @@ def update_potential_csv(
 
         slider_layouts = html.Div(
             slider_layouts,
-            style={"width": "39%", "float": "right", "display": "inline-block"},
+            style={"width": "49%", "float": "right", "display": "inline-block"},
         )
 
         return [slider_layouts]
 
 
+# @app.callback(
+#     Output("dropdown-container-output-div", "children"),
+#     Input({"type": "potential-slider", "index": ALL}, "value"),
+# )
+# def display_output(values):
+#     return html.Div(
+#         [html.Div(f"Dropdown {i + 1} = {value}") for (i, value) in enumerate(values)]
+#     )
+
+#############################
+#### updating potential #####
+##############################
 @app.callback(
-    Output("dropdown-container-output-div", "children"),
-    Input({"type": "potential-slider", "index": ALL}, "value"),
+    Output('potential-graph-camera', 'data'),
+    Input('plot-potential-3d-switch', 'on'),
+    Input("potential-graph", "figure"),
 )
-def display_output(values):
-    return html.Div(
-        [html.Div(f"Dropdown {i + 1} = {value}") for (i, value) in enumerate(values)]
-    )
+def update_camera(plot_potential_3d, dash_figure):
+    camera = None
+    if plot_potential_3d:
+        figure = go.Figure(dash_figure)
+        if 'scene' in figure['layout']:
+                camera = figure['layout']['scene']['camera']
+        else:
+                print('Scene not in camera')
+                camera = dict(
+                            up=dict(x=0, y=0, z=1),
+                            center=dict(x=0, y=0, z=0),
+                            eye=dict(x=1.25, y=1.25, z=1.25)
+                                )
+    # print(camera.eye)
+    return camera
+
+        
 
 ##############################
 ##### updating potential #####
@@ -195,11 +226,13 @@ def display_output(values):
     State("numpts-x-potential", "value"),
     State("numpts-y-potential", "value"),
     State("upload-data", "filename"),
+    State("potential-graph", "figure"),
+    State('potential-graph-camera', 'data'),
     Input({"type": "potential-slider", "index": ALL}, "value"),
     Input('plot-potential-3d-switch', 'on'),
 )
 def update_potential(
-    depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, slider_vals, plot_potential_3d
+    depth_2deg, minx, maxx, miny, maxy, nx, ny, filename, dash_figure, camera, slider_vals, plot_potential_3d
 ):
     if filename is not None:
         discretised_gates = get_discretised_gates_from_csv(
@@ -208,11 +241,31 @@ def update_potential(
         z_data = 0
         for index, (key, val) in enumerate(discretised_gates.items()):
             if "val_" in key:
-                discretised_gates[key]["gate_val"] = slider_vals[index][0]
+                discretised_gates[key]["gate_val"] = - slider_vals[index][0]
                 z_data = z_data + discretised_gates[key]["potential"]
 
         color_range = [np.min(z_data), np.max(z_data)]
         plot_info = get_plot_info(depth_2deg, minx, maxx, miny, maxy, nx, ny)
+
+        # figure = go.Figure(dash_figure)
+
+        # camera = None
+        # if plot_potential_3d:
+        #     if 'scene' in figure['layout']:
+        #         camera = figure['layout']['scene']['camera']
+
+        #         # camera.pop('projection', None)
+        #     else:
+        #         print('Scene not in camera')
+        #         camera = dict(
+        #                     up=dict(x=0, y=0, z=1),
+        #                     center=dict(x=0, y=0, z=0),
+        #                     eye=dict(x=1.25, y=1.25, z=1.25)
+        #                         )
+                
+        # print(camera)
+
+
         potential_fig = plot_discretised_gates(
             discretised_gates,
             plot_info,
@@ -220,8 +273,12 @@ def update_potential(
             plot=False,
             colorscale="Plotly3",
             color_range=color_range,
-            plot_3d=plot_potential_3d
+            plot_3d=plot_potential_3d,
+            camera = camera,
         )
+
+        potential_fig.update_layout(height=800, width=800)
+
 
         return potential_fig
     else:

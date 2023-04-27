@@ -89,7 +89,8 @@ def plot_discretised_gates(
     colorscale="Greens",
     color_range=None,
     plot_3d=False,
-    electron_charge = electron_charge
+    camera=None,
+    electron_charge = electron_charge,
 ):
     """
     General plotting function, takes discretised_gates data and handles how it should be plotted. 
@@ -138,9 +139,15 @@ def plot_discretised_gates(
             x=x_axis,
             y=y_axis,
             z=z_data,
+            cmin=zmin,
+            cmax=zmax,
             colorscale=colorscale,
         )
         fig.add_trace(surface_trace)
+        fig.update_layout(scene_camera=camera,
+                        scene = dict(
+                        zaxis = dict(range=[zmin*0.95,zmax*1.05],),),)
+
 
         # functionality of heatmap not great right now
         # # heatmap to see gate outline
