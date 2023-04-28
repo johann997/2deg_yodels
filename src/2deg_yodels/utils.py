@@ -84,7 +84,6 @@ def plot_discretised_gates(
     color_range=None,
     plot_3d=False,
     camera=None,
-    electron_charge = electron_charge,
 ):
     """
     General plotting function, takes discretised_gates data and handles how it should be plotted. 
@@ -106,9 +105,6 @@ def plot_discretised_gates(
 
     x_axis, y_axis, z_data = get_xyz_from_discretised_gates(discretised_gates, data_type=plot_type)
     x_axis, y_axis, gate_data = get_xyz_from_discretised_gates(discretised_gates, data_type="coordinates")
-
-    if plot_type == 'potential':
-        z_data *= electron_charge
 
     if color_range is None:
         zmin, zmax = np.min(z_data), np.max(z_data)
