@@ -121,7 +121,7 @@ def make_system(
     a=1,
     t=1,
     T=1,
-    dist=0.2,
+    dist=0.1,
 ):  # define the scattering region
     """
     Set up bulk system and add leads given their coordinates in um
@@ -238,7 +238,7 @@ def get_interpolated_potential(discretised_gates):
     return interpolated_potential
 
 
-def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts, a=0):
+def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, numpts, a=0, lead_length=0.1):
 
     interpolated_potential = get_interpolated_potential(discretised_gates)
 
@@ -270,7 +270,7 @@ def make_kwant_system(discretised_gates, lead_coords, minx, maxx, miny, maxy, nu
         a=a,
         t=t,
         T=T,
-        dist=0.1,
+        dist=lead_length,
     )
 
     return qpc

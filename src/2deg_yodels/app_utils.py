@@ -228,6 +228,13 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="y coordinate",
                     value=1.25,
                 ),
+                html.H4("Lead size"),
+                dcc.Input(
+                    id="lead-length",
+                    type="number",
+                    placeholder="length (um)",
+                    value=0.1,
+                ),
                 html.Button("Plot System", id="update-kwant-system"),
                 html.Div([html.Img(id = 'kwant-system', src = '')],
                             id='kwant-system-plot-div'),
@@ -257,9 +264,9 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                 html.H5("Gate 1 [id, min, max]"),
                 dcc.Input(
                     id="gate1-id",
-                    type="number",
+                    type="value",
                     placeholder="gate number",
-                    value=0,
+                    value="0",
                 ),
                 dcc.Input(
                     id="gate1-min",
@@ -277,9 +284,9 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                 html.H5("Gate 2 [id, min, max]"),
                 dcc.Input(
                     id="gate2-id",
-                    type="number",
+                    type="value",
                     placeholder="gate number",
-                    value=0,
+                    value="0",
                 ),
                 dcc.Input(
                     id="gate2-min",
