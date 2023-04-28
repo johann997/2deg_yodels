@@ -9,8 +9,9 @@ from utils import (
     get_xyz_from_discretised_gates
     )
 
-
-# constants
+#####################
+##### constants #####
+#####################
 electron_charge = 1.602e-19  # electron charge (C)
 hbar = 1.05e-34 # hbar
 nm = 1e-9  # nanometres
