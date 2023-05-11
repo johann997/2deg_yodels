@@ -51,7 +51,6 @@ def create_n_sliders(num_sliders, app_layout):
     return app_layout, app_inputs
 
 
-
 def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
     """
     Create base app layout
@@ -138,8 +137,13 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     id="discretised-gate-graph", figure=initial_fig, style=fig_style
                 ),
                 html.Button("Update Potential", id="update-potential"),
-                daq.BooleanSwitch(id='plot-potential-3d-switch', on=False, 
-                                  label="Plot 3d", labelPosition="top", color="#9B51E0",),
+                daq.BooleanSwitch(
+                    id="plot-potential-3d-switch",
+                    on=False,
+                    label="Plot 3d",
+                    labelPosition="top",
+                    color="#9B51E0",
+                ),
             ]
         ),
         html.Div(id="dummy1"),
@@ -147,48 +151,26 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
         html.H4("Potential change in 2DEG"),
     ]
 
-
-    # potential_layout = [
-    #     html.Div(
-    #         [
-    #             html.H4("Potential change in 2DEG"),
-    #             dcc.Graph(id="potential-graph"),
-    #             dcc.Store('potential-graph-camera'),
-    #         ],
-    #         style={"width": "90%", "height": "90%", "display": "inline-block"},
-    #     )
-    # ]
-
-    # potential_slider_layout = [
-    #     html.Div(
-    #         [
-    #             html.Div(id="potential-slider-container-div", children=[]),
-    #             html.Div(id="potential-slider-container-output-div"),
-    #         ]
-    #     )
-    # ]
-
     potential_layout = [
-        html.Div([
         html.Div(
             [
-                dcc.Graph(id="potential-graph"),
-                dcc.Store('potential-graph-camera'),
+                html.Div(
+                    [
+                        dcc.Graph(id="potential-graph"),
+                    ],
+                    style={"width": "59%", "height": "59%", "display": "inline-block"},
+                ),
+                html.Div(
+                    [
+                        html.Div(id="potential-slider-container-div", children=[]),
+                        html.Div(id="potential-slider-container-output-div"),
+                    ],
+                    style={"width": "100%", "display": "inline-block"},
+                ),
             ],
-            style={"width": "59%", "height": "59%", "display": "inline-block"},
-        ),
-        html.Div(
-            [
-                html.Div(id="potential-slider-container-div", children=[]),
-                html.Div(id="potential-slider-container-output-div"),
-            ],
-            style = {'width': '100%', 'display': 'inline-block'}
+            style={"display": "flex"},
         )
-    ], style={"display": "flex"})
     ]
-
-
-
 
     kwant_layout = [
         html.Div(
@@ -236,10 +218,13 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     value=0.1,
                 ),
                 html.Button("Plot System", id="update-kwant-system"),
-                html.Div([html.Img(id = 'kwant-system', src = '')],
-                            id='kwant-system-plot-div'),
-                html.Div([html.Img(id = 'kwant-band-structure', src = '')],
-                            id='kwant-band-structure-plot-div'),
+                html.Div(
+                    [html.Img(id="kwant-system", src="")], id="kwant-system-plot-div"
+                ),
+                html.Div(
+                    [html.Img(id="kwant-band-structure", src="")],
+                    id="kwant-band-structure-plot-div",
+                ),
                 html.H3("Plotting wave function and current"),
                 html.H4("Excitation energy at which to solve the scattering problem."),
                 dcc.Input(
@@ -248,11 +233,16 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="min numpts",
                     value=0.1,
                 ),
-                html.Button("Run wavefunction & Current", id="run-kwant-system-wf", n_clicks=0),
-                html.Div([html.Img(id = 'kwant-wave-function', src = '')],
-                            id='kwant-wave-function-plot-div'),
-                html.Div([html.Img(id = 'kwant-current', src = '')],
-                            id='kwant-current-plot-div'),
+                html.Button(
+                    "Run wavefunction & Current", id="run-kwant-system-wf", n_clicks=0
+                ),
+                html.Div(
+                    [html.Img(id="kwant-wave-function", src="")],
+                    id="kwant-wave-function-plot-div",
+                ),
+                html.Div(
+                    [html.Img(id="kwant-current", src="")], id="kwant-current-plot-div"
+                ),
                 html.H3("Run charge stability diagram"),
                 html.H4("Min number of points in simulation"),
                 dcc.Input(
@@ -280,7 +270,9 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="gate value max",
                     value=0,
                 ),
-                html.Button("Run Pinch off (1d plot)", id="run-kwant-system-1d", n_clicks=0),
+                html.Button(
+                    "Run Pinch off (1d plot)", id="run-kwant-system-1d", n_clicks=0
+                ),
                 html.H5("Gate 2 [id, min, max]"),
                 dcc.Input(
                     id="gate2-id",
@@ -300,19 +292,17 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
                     placeholder="gate value max",
                     value=0,
                 ),
-                html.Button("Run Charge Stability (2d plot)", id="run-kwant-system-2d", n_clicks=0),
-                dcc.Graph(
-                    id="kwant-simulation", figure=initial_fig, style=fig_style
+                html.Button(
+                    "Run Charge Stability (2d plot)",
+                    id="run-kwant-system-2d",
+                    n_clicks=0,
                 ),
+                dcc.Graph(id="kwant-simulation", figure=initial_fig, style=fig_style),
             ],
             style={"width": "59%", "height": "59%", "display": "inline-block"},
         )
     ]
 
-    # create_n_sliders_layout, app_inputs = create_n_sliders(num_sliders, potential_layout)
-    app_inputs = 0
+    app_layout = setup_layout + potential_layout + kwant_layout
 
-
-    app_layout = setup_layout + potential_layout  + kwant_layout
-
-    return app_layout, app_inputs
+    return app_layout
