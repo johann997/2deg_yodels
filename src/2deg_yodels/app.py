@@ -237,10 +237,7 @@ def update_potential(
         potential_fig.update_layout(height=800, width=800)
 
         for key, val in dash_figure.items():
-            print(key, val)
             if "scene.camera" in key:
-                print("IN KEYYYY")
-                print(f"Using val = {val}")
                 potential_fig.update_layout(scene_camera=val)
 
         return potential_fig
