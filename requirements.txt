@@ -48,7 +48,6 @@ jupyter_server==2.5.0
 jupyter_server_terminals==0.4.4
 jupyterlab-pygments==0.2.2
 jupyterlab-widgets==3.0.6
-kwant==1.4.3
 MarkupSafe==2.1.2
 matplotlib-inline==0.1.6
 mistune==2.0.5

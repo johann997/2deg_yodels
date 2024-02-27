@@ -15,7 +15,7 @@ printf %"$COLUMNS"s |tr " " "-"
 echo "Environment Activated"
 printf %"$COLUMNS"s |tr " " "-"
 
-conda install -c anaconda python
+conda install -c anaconda python=3.10
 printf %"$COLUMNS"s |tr " " "-"
 echo "Python Installed"
 printf %"$COLUMNS"s |tr " " "-"
