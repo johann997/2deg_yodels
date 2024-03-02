@@ -172,6 +172,51 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
         )
     ]
 
+    potential_plot = [
+        html.Div(
+            [
+                html.H3("Plotting Potential vs. Gate"),
+                html.H5("X Coord, Y Coord to Plot"),
+                dcc.Input(
+                    id="x-coord-pot",
+                    type="value",
+                    placeholder="X coordinate",
+                    value="0",
+                ),
+                dcc.Input(
+                    id="y-coord-pot",
+                    type="value",
+                    placeholder="Y coordinate",
+                    value="0",
+                ),
+                html.H5("Gate 1 [id, min, max]"),
+                dcc.Input(
+                    id="gate1-pot-id",
+                    type="text",
+                    placeholder="gate number",
+                    value="0",
+                ),
+                dcc.Input(
+                    id="gate1-pot-min",
+                    type="text",
+                    placeholder="gate value min",
+                    value="-1",
+                ),
+                dcc.Input(
+                    id="gate1-pot-max",
+                    type="text",
+                    placeholder="gate value max",
+                    value="0",
+                ),
+                html.Button(
+                    "Run Potential off (1d plot)", id="run-pot-plot-1d", n_clicks=0
+                ),
+                dcc.Graph(id="pot-vs-gate", figure=initial_fig, style=fig_style),
+            ],
+            style={"width": "59%", "height": "59%", "display": "inline-block"},
+        )
+    ]
+
     kwant_layout = [
         html.Div(
             [
@@ -303,6 +348,6 @@ def create_app_layout(initial_fig, UPLOAD_DIRECTORY):
         )
     ]
 
-    app_layout = setup_layout + potential_layout + kwant_layout
+    app_layout = setup_layout + potential_layout + potential_plot + kwant_layout
 
     return app_layout

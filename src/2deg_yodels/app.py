@@ -41,6 +41,7 @@ from kwant_utils import (
     get_kwant_transmission,
     plot_kwant_band_structure,
     plot_kwant_density,
+    get_interpolated_potential,
 )
 
 cwd = os.getcwd()
@@ -243,6 +244,87 @@ def update_potential(
         return potential_fig
     else:
         return default_fig()
+
+
+
+######################################################
+##### running potential plotting vs gate system  #####
+######################################################
+@app.callback(
+    Output("pot-vs-gate", "figure"),
+    Input("run-pot-plot-1d", "n_clicks"),
+    State("x-coord-pot", "value"),
+    State("y-coord-pot", "value"),
+    State("gate1-pot-id", "value"),
+    State("gate1-pot-min", "value"),
+    State("gate1-pot-max", "value"),
+    State("numpts-x-potential", "value"),
+    State("numpts-y-potential", "value"),
+    State("upload-data", "filename"),
+    State({"type": "potential-slider", "index": ALL}, "value"),
+)
+def plot_potential_vs_gate(
+    update_pot_vs_gate,
+    x_val,
+    y_val,
+    gates_id,
+    gates_min,
+    gates_max,
+    nx,
+    ny,
+    filename,
+    slider_vals,
+):
+    
+    # print(gates_id, gates_min, gates_max)
+    if filename is not None:
+        discretised_gates = get_discretised_gates_from_csv(
+            nx, ny, csv_name=f"{PROCESSED_DIRECTORY}/geometric_potential.csv"
+        )
+
+        for index, (key, val) in enumerate(discretised_gates.items()):
+            if "val_" in key:
+                discretised_gates[key]["gate_val"] = slider_vals[index][0]      
+
+        gate1_array = np.array(gates_id.split(","))
+        voltage_min_array = np.array(gates_min.split(",")).astype(float)
+        voltage_max_array = np.array(gates_max.split(",")).astype(float)
+        numpts = 100
+
+        potential_array = np.linspace(0, 1, numpts)
+
+        for pot_index in range(numpts):  # hard code 100 points for now
+            for gate_index, gate1_str in enumerate(gate1_array):
+                voltage = pot_index*((voltage_max_array[gate_index] - voltage_min_array[gate_index])/numpts) + voltage_min_array[gate_index]
+                discretised_gates[f"val_{int(gate1_str)}"]["gate_val"] = -voltage
+            x, y, potential = get_xyz_from_discretised_gates(discretised_gates, data_type="potential")
+            x_coord = np.argmin(np.abs(x - float(x_val)))
+            y_coord = np.argmin(np.abs(y - float(y_val)))
+
+            potential_array[pot_index] = potential[y_coord, x_coord]
+
+        # setting up figure for plotting
+        fig = default_fig()
+
+        x_axis_voltage = np.linspace(voltage_min_array[0], voltage_max_array[0], numpts)
+        
+        if "run-pot-plot-1d" == ctx.triggered_id:
+            fig.add_trace(
+                go.Scatter(
+                    x=x_axis_voltage,
+                    y=potential_array,
+                )
+            )
+            fig.update_layout(
+                xaxis_title=f"Gate Voltage {gate1_array} (V)", yaxis_title="Potential (V)"
+            )
+
+        return fig
+    else:
+        return default_fig()
+
+
+
 
 
 #################################
